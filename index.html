@@ -1,0 +1,3268 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>COROS MCP Demo</title>
+  <meta name="description" content="COROS MCP product demo in a ChatGPT-style interface, covering apps discovery, authorization flow, training insights, sleep analysis, and route estimation." />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+  <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+  <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+  <meta name="referrer" content="no-referrer" />
+  <meta property="og:title" content="COROS MCP Demo" />
+  <meta property="og:description" content="Interactive COROS MCP demo for internal product showcase, including apps connection, training data queries, sleep analysis, and route timing estimates." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="COROS MCP Demo" />
+  <meta name="twitter:description" content="Interactive COROS MCP demo for product showcase and internal review." />
+  <style>
+    :root {
+      --bg-main: #f9f9f9;
+      --bg-sidebar: #f7f7f8;
+      --bg-hover: #ececec;
+      --bg-active: #ebebeb;
+      --bg-card: #ffffff;
+      --bg-composer: #ffffff;
+      --line: #e6e6e6;
+      --line-soft: #ededed;
+      --text: #202123;
+      --text-mid: #353740;
+      --text-dim: #676b76;
+      --text-subtle: #8e8ea0;
+      --bg-soft: #f4f4f4;
+      --badge-easy: #7f9f2e;
+      --badge-hard: #4a3b2a;
+      --badge-mid: #596f37;
+      --shadow-composer: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 12px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+      background: var(--bg-main);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-scroll {
+      height: 100vh;
+      overflow-y: auto;
+      padding: 8px 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sb-header {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px;
+    }
+
+    .icon-btn {
+      height: 32px;
+      width: 32px;
+      border-radius: 8px;
+      border: 0;
+      background: transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #111827;
+      cursor: pointer;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg-hover);
+    }
+
+    .openai-glyph {
+      width: 18px;
+      height: 18px;
+      color: #111827;
+    }
+
+    .menu-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .menu-item {
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 10px;
+      color: #111827;
+      font-size: 15px;
+      text-decoration: none;
+    }
+
+    .menu-item:hover {
+      background: var(--bg-hover);
+    }
+
+    .menu-item.active-nav {
+      background: var(--bg-active);
+      font-weight: 500;
+    }
+
+    button.menu-item {
+      width: 100%;
+      border: 0;
+      text-align: left;
+      background: transparent;
+      font: inherit;
+    }
+
+    .menu-item .mini-key {
+      margin-left: auto;
+      color: var(--text-subtle);
+      font-size: 12px;
+      letter-spacing: 0.1px;
+    }
+
+    .menu-item svg {
+      width: 18px;
+      height: 18px;
+      color: #111827;
+      flex: 0 0 auto;
+    }
+
+    .menu-title {
+      font-size: 12px;
+      color: var(--text-subtle);
+      padding: 8px 10px 4px;
+    }
+
+    .project-item,
+    .chat-item {
+      height: 32px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px;
+      font-size: 14px;
+      color: #1f2937;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+
+    .project-item:hover,
+    .chat-item:hover {
+      background: var(--bg-hover);
+    }
+
+    .chat-item.active {
+      background: var(--bg-active);
+      font-weight: 500;
+    }
+
+    button.chat-item {
+      width: 100%;
+      border: 0;
+      text-align: left;
+      background: transparent;
+      font: inherit;
+    }
+
+    .chat-item .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      margin-left: auto;
+      background: transparent;
+      flex: 0 0 auto;
+    }
+
+    .chat-item.has-update .dot {
+      background: #0a66ff;
+    }
+
+    .spacer {
+      flex: 1;
+      min-height: 8px;
+    }
+
+    .user-row {
+      border-top: 1px solid var(--line);
+      margin-top: 6px;
+      padding: 10px 6px 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #d1d5db;
+      flex: 0 0 auto;
+    }
+
+    .user-meta {
+      min-width: 0;
+      line-height: 1.15;
+    }
+
+    .user-name {
+      font-size: 14px;
+      color: #111827;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-plan {
+      margin-top: 2px;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      background: rgba(249, 249, 249, 0.82);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid transparent;
+    }
+
+    .model-switch {
+      border: 0;
+      background: transparent;
+      border-radius: 10px;
+      height: 36px;
+      padding: 0 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #111827;
+      cursor: pointer;
+    }
+
+    .model-switch:hover {
+      background: var(--bg-hover);
+    }
+
+    .model-switch .muted {
+      color: var(--text-dim);
+      font-weight: 400;
+    }
+
+    .top-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .lang-toggle {
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid #d9dee6;
+      background: #fff;
+      color: #202123;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .lang-toggle:hover {
+      background: #f7f7f8;
+    }
+
+    .share-btn,
+    .circle-btn {
+      border: 0;
+      background: transparent;
+      color: #111827;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .share-btn {
+      height: 36px;
+      padding: 0 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+    }
+
+    .share-btn:hover,
+    .circle-btn:hover {
+      background: var(--bg-hover);
+    }
+
+    .circle-btn {
+      height: 36px;
+      width: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .content-scroll {
+      min-height: 0;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .thread {
+      width: min(100%, 848px);
+      margin: 0 auto;
+      padding: 6px 24px 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+
+    .user-turn {
+      margin-top: 12px;
+      margin-left: auto;
+      max-width: 72%;
+      border-radius: 26px;
+      background: #ececec;
+      color: #1f2937;
+      padding: 11px 16px;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .file-chip {
+      margin-top: 4px;
+      margin-left: auto;
+      max-width: 290px;
+      border: 1px solid #d8dbe0;
+      background: #f3f4f6;
+      border-radius: 12px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #1f2937;
+    }
+
+    .file-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: #9aa0a6;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+    }
+
+    .file-name {
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .file-type {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+
+    .assistant-turn {
+      margin-top: 34px;
+      padding-bottom: 18px;
+    }
+
+    .assistant-turn.compact {
+      margin-top: 18px;
+      padding-bottom: 8px;
+    }
+
+    .user-turn.followup {
+      margin-top: 14px;
+    }
+
+    .assistant-lead {
+      font-size: 16px;
+      line-height: 1.7;
+      color: #2a2b32;
+      font-weight: 400;
+    }
+
+    .thinking {
+      margin-top: 10px;
+      font-size: 15px;
+      color: var(--text-subtle);
+    }
+
+    .source-row {
+      margin-top: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #4b5563;
+      font-weight: 500;
+    }
+
+    .source-row .source-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #698f2f;
+      position: relative;
+    }
+
+    .source-row .source-dot::after {
+      content: "";
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border: 2px solid #fff;
+      border-top-color: transparent;
+      border-left-color: transparent;
+      border-radius: 2px;
+      left: 4px;
+      top: 3px;
+      transform: rotate(45deg);
+    }
+
+    .cards {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .route-card {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .cover {
+      position: relative;
+      height: 190px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #d8dbe0;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .cover.easy {
+      background-image: linear-gradient(to bottom, rgba(0,0,0,.03), rgba(0,0,0,.2)), url("https://images.unsplash.com/photo-1518005068251-37900150dfca?auto=format&fit=crop&w=800&q=70");
+    }
+
+    .cover.hard {
+      background-image: linear-gradient(to bottom, rgba(0,0,0,.03), rgba(0,0,0,.24)), url("https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=70");
+    }
+
+    .cover.moderate {
+      background-image: linear-gradient(to bottom, rgba(0,0,0,.04), rgba(0,0,0,.24)), url("https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=800&q=70");
+    }
+
+    .badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      padding: 4px 8px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    .badge.easy {
+      background: var(--badge-easy);
+    }
+
+    .badge.hard {
+      background: var(--badge-hard);
+    }
+
+    .badge.moderate {
+      background: var(--badge-mid);
+    }
+
+    .route-meta {
+      margin-top: 9px;
+      font-size: 14px;
+      color: var(--text-subtle);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .route-title {
+      margin-top: 6px;
+      font-size: 21px;
+      line-height: 1.26;
+      font-weight: 650;
+      color: #1f2937;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .route-stats {
+      margin-top: 9px;
+      font-size: 14px;
+      color: #6b7280;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .paragraph-divider {
+      height: 1px;
+      border: 0;
+      background: var(--line-soft);
+      margin: 26px 0 24px;
+    }
+
+    .assistant-body {
+      font-size: 16px;
+      line-height: 1.72;
+      color: #2a2b32;
+      margin-bottom: 18px;
+    }
+
+    .assistant-body p {
+      margin-bottom: 14px;
+    }
+
+    .assistant-body h3 {
+      font-size: 22px;
+      margin: 10px 0 8px;
+      line-height: 1.35;
+      letter-spacing: -0.02em;
+    }
+
+    .assistant-body ul {
+      padding-left: 24px;
+      margin: 6px 0 8px;
+    }
+
+    .assistant-body li {
+      margin: 4px 0;
+    }
+
+    .tool-summary {
+      font-size: 16px;
+      line-height: 1.72;
+      color: #2a2b32;
+      margin-bottom: 14px;
+    }
+
+    .tool-header {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      color: #4b5563;
+      font-size: 12px;
+      line-height: 1;
+      font-weight: 500;
+    }
+
+    .tool-header strong {
+      color: #202123;
+      font-weight: 600;
+    }
+
+    .tool-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+    }
+
+    .workout-cards {
+      display: flex;
+      gap: 12px;
+      margin: 14px 0 12px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scroll-snap-type: x proximity;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: #d1d5db transparent;
+    }
+
+    .workout-cards::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .workout-cards::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 999px;
+    }
+
+    .workout-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+      min-width: 264px;
+      flex: 0 0 264px;
+      scroll-snap-align: start;
+    }
+
+    .workout-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .workout-card-title {
+      font-size: 15px;
+      line-height: 1.35;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .workout-card-type {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 24px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      color: #4b5563;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .workout-card-meta {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #6b7280;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+    }
+
+    .workout-more-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: linear-gradient(180deg, #ffffff, #f7f9fc);
+    }
+
+    .workout-more-card p {
+      font-size: 14px;
+      color: #4b5563;
+      line-height: 1.65;
+    }
+
+    .workout-more-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #2563eb;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin: 12px 0 16px;
+    }
+
+    .metric-tile {
+      border: 1px solid #eceff3;
+      border-radius: 12px;
+      background: #fafbfc;
+      padding: 12px 14px;
+    }
+
+    .metric-tile-label {
+      font-size: 11px;
+      color: #8a9099;
+      margin-bottom: 5px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .metric-tile-value {
+      font-size: 19px;
+      line-height: 1.15;
+      color: #202123;
+      font-weight: 620;
+      letter-spacing: -0.02em;
+    }
+
+    .metric-tile-sub {
+      margin-top: 5px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #6f7681;
+    }
+
+    .sleep-chart-card {
+      margin: 14px 0 18px;
+      border: 1px solid #eceff3;
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+      padding: 14px 14px 12px;
+    }
+
+    .sleep-chart-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .sleep-chart-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #202123;
+      margin-bottom: 3px;
+      letter-spacing: -0.01em;
+    }
+
+    .sleep-chart-sub {
+      max-width: 440px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #7b828c;
+    }
+
+    .sleep-chart-legend {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: #7b828c;
+      white-space: nowrap;
+    }
+
+    .sleep-chart-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .legend-dot.total { background: #e3e8ef; }
+    .legend-dot.deep { background: #7d8ca1; }
+    .legend-dot.rem { background: #bcc7d5; }
+    .legend-dot.recovery { background: #5f6c82; }
+
+    .sleep-chart {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .sleep-axis-label {
+      font-size: 11px;
+      fill: #8a9099;
+    }
+
+    .sleep-chart-caption {
+      display: grid;
+      gap: 4px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #f1f3f6;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #707782;
+    }
+
+    .sleep-chart-caption span {
+      display: block;
+    }
+
+    .scope-tags,
+    .prompt-chips {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 12px 0 14px;
+    }
+
+    .scope-tags span,
+    .prompt-chips span {
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      padding: 7px 11px;
+      font-size: 13px;
+      line-height: 1;
+      color: #374151;
+    }
+
+    .privacy-box {
+      border: 1px solid #e5e7eb;
+      background: #fafafa;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 8px;
+    }
+
+    .privacy-box strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: #202123;
+    }
+
+    .privacy-box p {
+      margin-bottom: 0;
+      font-size: 13px;
+      line-height: 1.65;
+      color: #6b7280;
+    }
+
+    .conversation {
+      display: none;
+    }
+
+    .conversation.active {
+      display: block;
+    }
+
+    .view {
+      display: none;
+      min-height: 100%;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .apps-page {
+      width: min(100%, 1060px);
+      margin: 0 auto;
+      padding: 24px 24px 30px;
+    }
+
+    .apps-head h1 {
+      font-size: 30px;
+      line-height: 1.3;
+      margin-bottom: 6px;
+      letter-spacing: -0.2px;
+    }
+
+    .apps-head p {
+      color: var(--text-dim);
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .apps-search {
+      width: 100%;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid #dde1e6;
+      padding: 0 14px;
+      font-size: 14px;
+      color: #111827;
+      background: #fff;
+      margin-bottom: 14px;
+      outline: none;
+    }
+
+    .apps-search:focus {
+      border-color: #b8c0cc;
+    }
+
+    .apps-cats {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .apps-cats button {
+      border: 1px solid #dbe0e6;
+      background: #fff;
+      color: #374151;
+      border-radius: 999px;
+      height: 32px;
+      padding: 0 12px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .apps-cats button.active {
+      background: #111827;
+      border-color: #111827;
+      color: #fff;
+    }
+
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .app-card {
+      background: #fff;
+      border: 1px solid #e2e6eb;
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 154px;
+    }
+
+    .app-card.clickable {
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+    }
+
+    .app-card.clickable:hover {
+      transform: translateY(-1px);
+      border-color: #cfd6df;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .app-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #111827, #374151);
+      color: #fff;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      flex: 0 0 auto;
+    }
+
+    .app-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111827;
+      line-height: 1.35;
+    }
+
+    .app-by {
+      font-size: 12px;
+      color: var(--text-subtle);
+      margin-top: 2px;
+    }
+
+    .app-desc {
+      font-size: 13px;
+      color: #4b5563;
+      line-height: 1.55;
+      flex: 1;
+    }
+
+    .app-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .app-detail {
+      width: min(100%, 880px);
+      margin: 0 auto;
+      padding: 22px 24px 30px;
+    }
+
+    .back-btn {
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid #d9dee6;
+      background: #fff;
+      color: #374151;
+      padding: 0 12px;
+      font-size: 13px;
+      cursor: pointer;
+      margin-bottom: 14px;
+    }
+
+    .back-btn:hover {
+      background: #f8fafc;
+    }
+
+    .app-detail-card {
+      background: #fff;
+      border: 1px solid #e2e6eb;
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .app-detail-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .app-detail-head h2 {
+      font-size: 24px;
+      line-height: 1.3;
+    }
+
+    .app-detail-head p {
+      color: #6b7280;
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .app-detail-body p {
+      color: #374151;
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    .app-detail-body ul {
+      padding-left: 20px;
+      color: #374151;
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+
+    .app-detail-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-detail-actions button {
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid #d9dee6;
+      background: #fff;
+      padding: 0 12px;
+      font-size: 13px;
+      cursor: pointer;
+      color: #374151;
+    }
+
+    .app-detail-actions .primary {
+      background: #111827;
+      border-color: #111827;
+      color: #fff;
+    }
+
+    .demo-view {
+      min-height: calc(100vh - 140px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px 48px;
+    }
+
+    .demo-card {
+      width: min(100%, 760px);
+      text-align: center;
+    }
+
+    .demo-mark {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      margin: 0 auto 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #ffffff, #f3f4f6);
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      color: #202123;
+      font-size: 26px;
+    }
+
+    .demo-card h2 {
+      font-size: 34px;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      color: #202123;
+      margin-bottom: 12px;
+    }
+
+    .demo-card p {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #4b5563;
+      max-width: 41em;
+      margin: 0 auto;
+    }
+
+    .demo-card p + p {
+      margin-top: 8px;
+    }
+
+    .demo-actions {
+      margin-top: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .demo-action {
+      height: 38px;
+      border-radius: 999px;
+      border: 1px solid #d9dee6;
+      background: #fff;
+      color: #202123;
+      padding: 0 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .demo-action.primary {
+      background: #202123;
+      border-color: #202123;
+      color: #fff;
+    }
+
+    .demo-context {
+      margin-top: 18px;
+      font-size: 13px;
+      color: #8b909b;
+    }
+
+    .auth-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.42);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 40;
+      padding: 16px;
+    }
+
+    .auth-modal.show {
+      display: flex;
+    }
+
+    .auth-panel {
+      width: min(640px, 100%);
+      background: #fff;
+      border-radius: 20px;
+      border: 1px solid #e6e8ec;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+      padding: 22px 22px 16px;
+    }
+
+    .auth-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .auth-head h3 {
+      font-size: 21px;
+      line-height: 1.25;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+    }
+
+    .auth-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      border: 0;
+      background: transparent;
+      font-size: 22px;
+      cursor: pointer;
+      color: #6b7280;
+      line-height: 1;
+    }
+
+    .auth-close:hover {
+      background: #f3f4f6;
+    }
+
+    .auth-desc {
+      font-size: 14px;
+      color: #4b5563;
+      line-height: 1.65;
+      margin-bottom: 16px;
+      max-width: 34em;
+    }
+
+    .auth-body {
+      display: grid;
+      grid-template-columns: 184px minmax(0, 1fr);
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .qr {
+      width: 184px;
+      height: 184px;
+      border-radius: 18px;
+      border: 1px solid #dfe4ea;
+      background:
+        linear-gradient(180deg, #ffffff, #fbfbfc);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .qr::before {
+      content: "";
+      position: absolute;
+      inset: 16px;
+      border-radius: 10px;
+      background:
+        linear-gradient(90deg, rgba(17, 17, 17, 0.08) 0 10px, transparent 10px 20px, rgba(17, 17, 17, 0.08) 20px 30px, transparent 30px 40px, rgba(17, 17, 17, 0.08) 40px 50px, transparent 50px 60px, rgba(17, 17, 17, 0.08) 60px 70px, transparent 70px 80px, rgba(17, 17, 17, 0.08) 80px 90px, transparent 90px),
+        linear-gradient(rgba(17, 17, 17, 0.08) 0 10px, transparent 10px 20px, rgba(17, 17, 17, 0.08) 20px 30px, transparent 30px 40px, rgba(17, 17, 17, 0.08) 40px 50px, transparent 50px 60px, rgba(17, 17, 17, 0.08) 60px 70px, transparent 70px 80px, rgba(17, 17, 17, 0.08) 80px 90px, transparent 90px);
+      background-size: 90px 90px, 90px 90px;
+      background-position: 31px 31px, 31px 31px;
+      background-repeat: no-repeat;
+    }
+
+    .qr-finder {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border: 7px solid #111;
+      background: #fff;
+      border-radius: 2px;
+    }
+
+    .qr-finder::after {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      background: #111;
+    }
+
+    .qr-finder.tl { top: 18px; left: 18px; }
+    .qr-finder.tr { top: 18px; right: 18px; }
+    .qr-finder.bl { bottom: 18px; left: 18px; }
+
+    .qr-noise {
+      position: absolute;
+      background: #111;
+      border-radius: 1px;
+    }
+
+    .qr-noise.n1 { width: 12px; height: 12px; top: 44px; left: 104px; }
+    .qr-noise.n2 { width: 8px; height: 8px; top: 58px; left: 122px; }
+    .qr-noise.n3 { width: 18px; height: 8px; top: 79px; left: 98px; }
+    .qr-noise.n4 { width: 8px; height: 18px; top: 94px; left: 136px; }
+    .qr-noise.n5 { width: 14px; height: 14px; top: 112px; left: 92px; }
+    .qr-noise.n6 { width: 10px; height: 10px; top: 130px; left: 114px; }
+    .qr-noise.n7 { width: 22px; height: 8px; top: 124px; left: 62px; }
+    .qr-noise.n8 { width: 8px; height: 22px; top: 98px; left: 62px; }
+    .qr-noise.n9 { width: 12px; height: 12px; top: 74px; left: 62px; }
+    .qr-noise.n10 { width: 10px; height: 10px; top: 148px; left: 96px; }
+    .qr-noise.n11 { width: 8px; height: 24px; top: 56px; left: 86px; }
+    .qr-noise.n12 { width: 16px; height: 8px; top: 144px; left: 124px; }
+    .qr-noise.n13 { width: 8px; height: 8px; top: 102px; left: 116px; }
+    .qr-noise.n14 { width: 14px; height: 14px; top: 136px; left: 144px; }
+
+    .auth-steps {
+      font-size: 14px;
+      color: #374151;
+      line-height: 1.85;
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .auth-steps li + li {
+      margin-top: 2px;
+    }
+
+    .auth-note {
+      border-top: 1px solid #eef1f4;
+      padding-top: 12px;
+      font-size: 12px;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .auth-note .ok {
+      height: 36px;
+      min-width: 92px;
+      white-space: nowrap;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      border-radius: 999px;
+      padding: 0 16px;
+      cursor: pointer;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .composer-wrap {
+      position: sticky;
+      bottom: 0;
+      margin-top: auto;
+      background: linear-gradient(to bottom, rgba(247, 247, 248, 0), rgba(247, 247, 248, 0.9) 35%, rgba(247, 247, 248, 1) 55%);
+      padding-top: 12px;
+      z-index: 6;
+    }
+
+    .composer {
+      background: var(--bg-composer);
+      border-radius: 28px;
+      border: 1px solid #dadde3;
+      box-shadow: var(--shadow-composer);
+      min-height: 96px;
+      padding: 13px 14px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .composer-input {
+      border: 0;
+      resize: none;
+      outline: none;
+      width: 100%;
+      background: transparent;
+      font: inherit;
+      font-size: 16px;
+      color: #1f2937;
+      min-height: 36px;
+    }
+
+    .composer-input::placeholder {
+      color: #9ca3af;
+    }
+
+    .composer-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .composer-left,
+    .composer-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #4b5563;
+      font-size: 14px;
+    }
+
+    .composer-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      border: 0;
+      background: transparent;
+      color: #374151;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .composer-btn:hover {
+      background: var(--bg-hover);
+    }
+
+    .thinking-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #2563eb;
+      background: #eff6ff;
+      border-radius: 999px;
+      padding: 5px 10px;
+    }
+
+    .source-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #4f7b22;
+      background: #f3f8ea;
+      border-radius: 999px;
+      padding: 5px 10px;
+    }
+
+    .voice-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      border: 0;
+      background: #101010;
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    .disclaimer {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8b8f98;
+      font-size: 12px;
+      margin-top: 6px;
+      margin-bottom: 2px;
+    }
+
+    .disclaimer a {
+      color: #4b5563;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 1080px) {
+      .app-shell {
+        grid-template-columns: 220px minmax(0, 1fr);
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .route-title {
+        font-size: 18px;
+      }
+
+      .route-stats {
+        font-size: 14px;
+      }
+
+      .apps-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .metric-strip {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 800px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .thread {
+        padding: 0 12px;
+      }
+
+      .user-turn {
+        max-width: 90%;
+      }
+
+      .model-switch {
+        font-size: 15px;
+      }
+
+      .assistant-lead {
+        font-size: 16px;
+      }
+
+      .apps-page {
+        padding: 16px 12px 20px;
+      }
+
+      .demo-view {
+        min-height: calc(100vh - 110px);
+        padding: 18px 12px 24px;
+      }
+
+      .demo-mark {
+        width: 50px;
+        height: 50px;
+        border-radius: 16px;
+        font-size: 22px;
+      }
+
+      .demo-card h2 {
+        font-size: 24px;
+      }
+
+      .apps-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .auth-panel {
+        padding: 18px 16px 14px;
+      }
+
+      .auth-body {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .qr {
+        width: 172px;
+        height: 172px;
+        margin: 0 auto;
+      }
+
+      .auth-desc {
+        max-width: none;
+      }
+
+      .auth-note {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .auth-note .ok {
+        align-self: flex-end;
+      }
+
+      .workout-card {
+        min-width: 232px;
+        flex-basis: 232px;
+      }
+
+      .sleep-chart-head {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-scroll">
+        <div class="sb-header">
+          <button class="icon-btn" aria-label="主页">
+            <svg class="openai-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3.2 6.8 6.2v5.6l5.2 3 5.2-3V6.2z" />
+              <path d="m6.8 6.2 5.2 3 5.2-3" />
+              <path d="M12 14.8v5.8" />
+            </svg>
+          </button>
+          <button class="icon-btn" aria-label="切换边栏">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="5" width="16" height="14" rx="3" />
+              <path d="M10 5v14" />
+            </svg>
+          </button>
+        </div>
+
+        <nav class="menu-group" aria-label="主菜单">
+          <a class="menu-item" href="#" data-demo-target="新聊天">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14" /></svg>
+            <span id="labelNewChat">新聊天</span>
+            <span class="mini-key">⇧⌘O</span>
+          </a>
+          <a class="menu-item" href="#" data-demo-target="搜索聊天">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.4-3.4" /></svg>
+            <span id="labelSearchChats">搜索聊天</span>
+            <span class="mini-key">⌘K</span>
+          </a>
+          <a class="menu-item" href="#" data-demo-target="图片">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3" /><circle cx="9" cy="10" r="2" /><path d="m21 16-5.5-5.5L9 17" /></svg>
+            <span id="labelImages">图片</span>
+          </a>
+          <button class="menu-item" data-nav-target="apps" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="2" /><rect x="13" y="4" width="7" height="7" rx="2" /><rect x="4" y="13" width="7" height="7" rx="2" /><rect x="13" y="13" width="7" height="7" rx="2" /></svg>
+            <span id="labelApps">应用</span>
+          </button>
+          <a class="menu-item" href="#" data-demo-target="深度研究">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 14.7 9.3 21 12l-6.3 2.7L12 21l-2.7-6.3L3 12l6.3-2.7z" /></svg>
+            <span id="labelDeepResearch">深度研究</span>
+          </a>
+          <a class="menu-item" href="#" data-demo-target="Codex">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2 6.8 6.2v5.6l5.2 3 5.2-3V6.2z" /><path d="m6.8 6.2 5.2 3 5.2-3" /></svg>
+            <span>Codex</span>
+          </a>
+          <a class="menu-item" href="#" data-demo-target="GPT">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7z" /></svg>
+            <span id="labelGpts">GPT</span>
+          </a>
+        </nav>
+
+        <div class="menu-title" id="menuTitleProjects">项目</div>
+        <div class="menu-group">
+          <div class="project-item" data-demo-target="新项目">⊞ 新项目</div>
+          <div class="project-item" data-demo-target="Coros MCP &amp; Agent">☐ Coros MCP &amp; Agent</div>
+          <div class="project-item" data-demo-target="Coros-Link">☐ Coros-Link</div>
+        </div>
+
+        <div class="menu-title" id="menuTitleChats">你的聊天</div>
+        <div class="menu-group">
+          <button class="chat-item" data-chat-target="coros-basic"><span class="chat-label" data-chat-label="coros-basic">Coros基本数据查询</span> <span class="dot"></span></button>
+          <button class="chat-item" data-chat-target="sleep-analysis"><span class="chat-label" data-chat-label="sleep-analysis">睡眠数据分析</span> <span class="dot"></span></button>
+          <button class="chat-item" data-chat-target="hongkong"><span class="chat-label" data-chat-label="hongkong">香港徒步路线推荐</span> <span class="dot"></span></button>
+          <button class="chat-item active" data-chat-target="analysis"><span class="chat-label" data-chat-label="analysis">路线分析与预计时间</span> <span class="dot"></span></button>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="user-row">
+          <div class="avatar"></div>
+          <div class="user-meta">
+            <div class="user-name">许志翔</div>
+            <div class="user-plan">Plus</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="main">
+      <header class="topbar">
+        <button class="model-switch">
+          <span><strong>ChatGPT 5.4</strong> <span class="muted" id="modelModeLabel">Thinking</span></span>
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 7 5 6 5-6" /></svg>
+        </button>
+
+        <div class="top-actions">
+          <button class="lang-toggle" type="button" id="langToggle">EN</button>
+          <button class="share-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12" /><path d="m7 8 5-5 5 5" /><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" /></svg>
+            <span id="shareLabel">分享</span>
+          </button>
+          <button class="circle-btn" aria-label="更多选项">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8" /><circle cx="12" cy="12" r="1.8" /><circle cx="19" cy="12" r="1.8" /></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="content-scroll">
+        <div class="view view-chat active" data-view="chat">
+        <main class="thread" id="main">
+          <section class="conversation" data-chat-id="coros-basic">
+            <div class="user-turn">@Coros 先帮我查活动记录。</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>活动记录 · 实时读取</span></div>
+              <div class="assistant-body">
+                <h3>结果概览</h3>
+                <p>已同步你最近 30 天的活动历史。整体来看，你一共完成 42 次运动，总时长 46h 12m，其中跑步和骑行占比最高；近 7 天的记录如下，适合继续下钻看单次训练表现。</p>
+              </div>
+              <div class="workout-cards">
+                <article class="workout-card">
+                  <div class="workout-card-head">
+                    <div class="workout-card-title">清水湾海岸耐力跑</div>
+                    <span class="workout-card-type">跑步</span>
+                  </div>
+                  <div class="workout-card-meta">
+                    <span>昨天</span>
+                    <span>14.2 km</span>
+                    <span>1h 18m</span>
+                    <span>平均心率 148 bpm</span>
+                  </div>
+                </article>
+                <article class="workout-card">
+                  <div class="workout-card-head">
+                    <div class="workout-card-title">大帽山爬升骑行</div>
+                    <span class="workout-card-type">骑行</span>
+                  </div>
+                  <div class="workout-card-meta">
+                    <span>3 天前</span>
+                    <span>52.4 km</span>
+                    <span>2h 06m</span>
+                    <span>爬升 812 m</span>
+                  </div>
+                </article>
+                <article class="workout-card">
+                  <div class="workout-card-head">
+                    <div class="workout-card-title">麦理浩径恢复徒步</div>
+                    <span class="workout-card-type">徒步</span>
+                  </div>
+                  <div class="workout-card-meta">
+                    <span>6 天前</span>
+                    <span>9.8 km</span>
+                    <span>2h 31m</span>
+                    <span>平均配速 15'23"/km</span>
+                  </div>
+                </article>
+                <article class="workout-card">
+                  <div class="workout-card-head">
+                    <div class="workout-card-title">西贡轻松跑</div>
+                    <span class="workout-card-type">跑步</span>
+                  </div>
+                  <div class="workout-card-meta">
+                    <span>7 天前</span>
+                    <span>8.6 km</span>
+                    <span>48m</span>
+                    <span>训练负荷 86</span>
+                  </div>
+                </article>
+                <article class="workout-card workout-more-card">
+                  <div class="workout-card-head">
+                    <div class="workout-card-title">查看更多</div>
+                    <span class="workout-card-type">COROS App</span>
+                  </div>
+                  <p>打开 COROS App 查看完整近 7 天活动列表、单次详情、轨迹和每次训练的 EvoLab 指标。</p>
+                  <a class="workout-more-link" href="javascript:void(0)">前往活动记录 ›</a>
+                </article>
+              </div>
+              <div class="assistant-body">
+                <h3>简短解读</h3>
+                <p>近 7 天训练结构以 2 次跑步、1 次骑行、1 次徒步为主，说明你的有氧基础和坡度适应正在并行维持。最近一次跑步与骑行都落在中高质量区间，整体训练连续性不错。</p>
+              </div>
+            </section>
+
+            <div class="user-turn followup">@Coros 再帮我查活动消耗。</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>活动消耗 · 训练摘要</span></div>
+              <div class="assistant-body">
+                <h3>结果概览</h3>
+                <p>最近 30 天总活动消耗 28,640 kcal，单次均值 682 kcal。近 7 天消耗最高的是“大帽山爬升骑行”这次，单次 1,124 kcal。</p>
+                <h3>项目对比</h3>
+                <ul>
+                  <li>跑步：单次均值 742 kcal，单位时长消耗最高</li>
+                  <li>骑行：总消耗贡献最高，长距离带来更明显累计值</li>
+                  <li>徒步：单位时长消耗更稳定，适合恢复周维持负荷</li>
+                </ul>
+                <h3>简短解读</h3>
+                <p>你当前的总消耗主要由跑步和骑行拉动，说明训练结构偏向耐力与爬升混合型。若要控制疲劳，后续可以把高消耗骑行后的次日安排成低冲击恢复训练。</p>
+              </div>
+            </section>
+
+            <div class="user-turn followup">@Coros 再看心率数据和静息心率。</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>心率 · 静息心率</span></div>
+              <div class="assistant-body">
+                <h3>活动心率结果</h3>
+                <p>平均活动心率 142 bpm；高强度区间 Z4-Z5 占比 21%，说明最近一周训练中质量课占比偏高。</p>
+                <h3>静息心率变化</h3>
+                <p>静息心率近 7 天均值 48 bpm，较前 7 天上升 1.8 bpm，变化幅度不大，但已经开始反映恢复压力累积。</p>
+                <h3>风险提示</h3>
+                <p>如果接下来 3 天静息心率继续上升，且恢复评分同步下滑，就需要主动降低强度密度，避免把高质量训练堆得过近。</p>
+              </div>
+            </section>
+
+            <div class="user-turn followup">@Coros 体力恢复和训练量评估也给我。</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>EvoLab · 恢复与训练状态</span></div>
+              <div class="assistant-body">
+                <h3>恢复状态</h3>
+                <p>恢复评分均值 73/100，最近 3 天连续走低，但还没有进入明显异常区间。当前更像是训练刺激持续叠加，而不是单次异常疲劳。</p>
+                <h3>训练负荷</h3>
+                <p>7 日训练量 684，处于 “Optimized” 区间上沿。和 42 日 Base Fitness 对比后，当前负荷仍在可承受范围，但已经接近你近期的稳定上限。</p>
+                <h3>当前判断</h3>
+                <p>你现在适合维持训练频率，但不建议继续增加高强度课比例。更稳的策略是保留 1 次关键课，其余训练偏向轻松跑、恢复骑行或低强度徒步。</p>
+              </div>
+            </section>
+
+            <div class="user-turn followup">@Coros 跑步能力、骑行能力、个人纪录呢？</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>能力评估 · 纪录</span></div>
+              <div class="assistant-body">
+                <h3>跑步能力</h3>
+                <p>VO2Max 54，马拉松预测 3:24:40。说明你的跑步能力已经具备稳定有氧基础，长距离配速控制能力也处在较成熟区间。</p>
+                <h3>骑行能力</h3>
+                <p>FTP 236W（3.28W/kg），近 4 周提升 +6W。骑行能力目前处于持续进步阶段，爬升段输出稳定性比前一个周期更好。</p>
+                <h3>个人纪录</h3>
+                <ul>
+                  <li>5K：20:31</li>
+                  <li>10K：43:48</li>
+                  <li>半马：1:39:12</li>
+                </ul>
+                <h3>简短解读</h3>
+                <p>整体能力画像偏“耐力型混合选手”：跑步能力是主轴，骑行能力在补强上坡与持续输出，适合继续做越野、徒步和多项目耐力场景联动分析。</p>
+              </div>
+            </section>
+
+            <div class="user-turn followup">@Coros 最后查设备状态（设备数量、保修有效期、蓝牙 ID）。</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>设备资产 · 账号绑定</span></div>
+              <div class="assistant-body">
+                <h3>设备总览</h3>
+                <p>当前账号下共绑定 2 台设备，分别是 VERTIX 2S 和 PACE 3，状态均为正常使用中。</p>
+                <h3>售后状态</h3>
+                <ul>
+                  <li>VERTIX 2S：保修有效至 2027-05-18，售后状态正常</li>
+                  <li>PACE 3：保修有效至 2026-11-02，售后状态正常</li>
+                </ul>
+                <h3>识别信息</h3>
+                <p>蓝牙 ID 分别为 A4:C1:38:7D:91:2F、7C:9E:BD:41:63:88，可用于排查连接与售后定位问题。</p>
+                <h3>简短说明</h3>
+                <p>如果要解绑或调整第三方授权，可直接在 COROS App 的设备管理和第三方连接设置里处理；当前两台设备都没有看到异常保修或绑定风险。</p>
+              </div>
+            </section>
+          </section>
+
+          <section class="conversation" data-chat-id="sleep-analysis">
+            <div class="user-turn">@Coros 帮我查一下近七天睡眠，并做一个恢复状态分析。</div>
+
+            <section class="assistant-turn">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>睡眠质量 · 恢复分析</span></div>
+              <p class="assistant-lead">我把你最近 7 天睡眠与恢复指标对齐后做了汇总，先给你结构化结果，再补可执行建议。</p>
+              <div class="thinking">已思考 12s</div>
+
+              <div class="metric-strip">
+                <div class="metric-tile">
+                  <div class="metric-tile-label">平均睡眠</div>
+                  <div class="metric-tile-value">7h 06m</div>
+                  <div class="metric-tile-sub">较目标少 24 分钟</div>
+                </div>
+                <div class="metric-tile">
+                  <div class="metric-tile-label">平均睡眠评分</div>
+                  <div class="metric-tile-value">79</div>
+                  <div class="metric-tile-sub">Good 区间</div>
+                </div>
+                <div class="metric-tile">
+                  <div class="metric-tile-label">平均恢复评分</div>
+                  <div class="metric-tile-value">74</div>
+                  <div class="metric-tile-sub">周四与周六明显走低</div>
+                </div>
+              </div>
+
+              <div class="sleep-chart-card">
+                <div class="sleep-chart-head">
+                  <div>
+                    <div class="sleep-chart-title">近 7 天睡眠与恢复趋势</div>
+                    <div class="sleep-chart-sub">睡眠柱体展示总时长与睡眠结构，折线展示次日恢复评分变化。</div>
+                  </div>
+                  <div class="sleep-chart-legend">
+                    <span><i class="legend-dot total"></i>总睡眠</span>
+                    <span><i class="legend-dot deep"></i>深睡</span>
+                    <span><i class="legend-dot rem"></i>REM</span>
+                    <span><i class="legend-dot recovery"></i>恢复评分</span>
+                  </div>
+                </div>
+                <svg class="sleep-chart" viewBox="0 0 760 280" aria-label="近七天睡眠与恢复图表">
+                  <line x1="50" y1="36" x2="50" y2="220" stroke="#e8edf2" />
+                  <line x1="50" y1="220" x2="732" y2="220" stroke="#e8edf2" />
+                  <line x1="50" y1="82" x2="732" y2="82" stroke="#f4f6f8" />
+                  <line x1="50" y1="128" x2="732" y2="128" stroke="#f4f6f8" />
+                  <line x1="50" y1="174" x2="732" y2="174" stroke="#f4f6f8" />
+
+                  <text x="18" y="222" class="sleep-axis-label">0h</text>
+                  <text x="12" y="178" class="sleep-axis-label">3h</text>
+                  <text x="12" y="132" class="sleep-axis-label">6h</text>
+                  <text x="12" y="86" class="sleep-axis-label">9h</text>
+
+                  <g>
+                    <rect x="84" y="76" width="38" height="144" rx="10" fill="#eef2f6" />
+                    <rect x="84" y="189" width="38" height="31" rx="10" fill="#bcc7d5" />
+                    <rect x="84" y="162" width="38" height="27" rx="10" fill="#7d8ca1" />
+
+                    <rect x="178" y="88" width="38" height="132" rx="10" fill="#eef2f6" />
+                    <rect x="178" y="188" width="38" height="32" rx="10" fill="#bcc7d5" />
+                    <rect x="178" y="164" width="38" height="24" rx="10" fill="#7d8ca1" />
+
+                    <rect x="272" y="64" width="38" height="156" rx="10" fill="#eef2f6" />
+                    <rect x="272" y="190" width="38" height="30" rx="10" fill="#bcc7d5" />
+                    <rect x="272" y="158" width="38" height="32" rx="10" fill="#7d8ca1" />
+
+                    <rect x="366" y="108" width="38" height="112" rx="10" fill="#eef2f6" />
+                    <rect x="366" y="195" width="38" height="25" rx="10" fill="#bcc7d5" />
+                    <rect x="366" y="177" width="38" height="18" rx="10" fill="#7d8ca1" />
+
+                    <rect x="460" y="96" width="38" height="124" rx="10" fill="#eef2f6" />
+                    <rect x="460" y="194" width="38" height="26" rx="10" fill="#bcc7d5" />
+                    <rect x="460" y="172" width="38" height="22" rx="10" fill="#7d8ca1" />
+
+                    <rect x="554" y="120" width="38" height="100" rx="10" fill="#eef2f6" />
+                    <rect x="554" y="199" width="38" height="21" rx="10" fill="#bcc7d5" />
+                    <rect x="554" y="183" width="38" height="16" rx="10" fill="#7d8ca1" />
+
+                    <rect x="648" y="74" width="38" height="146" rx="10" fill="#eef2f6" />
+                    <rect x="648" y="190" width="38" height="30" rx="10" fill="#bcc7d5" />
+                    <rect x="648" y="160" width="38" height="30" rx="10" fill="#7d8ca1" />
+                  </g>
+
+                  <polyline fill="none" stroke="#5f6c82" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" points="103,96 197,90 291,82 385,120 479,102 573,132 667,92" />
+                  <g fill="#5f6c82">
+                    <circle cx="103" cy="96" r="3.6" />
+                    <circle cx="197" cy="90" r="3.6" />
+                    <circle cx="291" cy="82" r="3.6" />
+                    <circle cx="385" cy="120" r="3.6" />
+                    <circle cx="479" cy="102" r="3.6" />
+                    <circle cx="573" cy="132" r="3.6" />
+                    <circle cx="667" cy="92" r="3.6" />
+                  </g>
+
+                  <text x="90" y="246" class="sleep-axis-label">周一</text>
+                  <text x="184" y="246" class="sleep-axis-label">周二</text>
+                  <text x="278" y="246" class="sleep-axis-label">周三</text>
+                  <text x="372" y="246" class="sleep-axis-label">周四</text>
+                  <text x="466" y="246" class="sleep-axis-label">周五</text>
+                  <text x="560" y="246" class="sleep-axis-label">周六</text>
+                  <text x="654" y="246" class="sleep-axis-label">周日</text>
+
+                </svg>
+                <div class="sleep-chart-caption">
+                  <span>周三的睡眠结构最完整，恢复评分也同步来到本周高点。</span>
+                  <span>周六睡眠时长跌破 6 小时后，恢复表现出现全周最明显的回落。</span>
+                </div>
+              </div>
+
+              <div class="assistant-body">
+                <h3>结果概览</h3>
+                <ul>
+                  <li>平均总睡眠：7h 06m（目标 7h 30m，缺口 24m）</li>
+                  <li>平均入睡时长：18m；夜间觉醒：1.6 次/晚</li>
+                  <li>深睡均值：1h 24m；REM 均值：1h 31m</li>
+                  <li>睡眠规律性：中等，周三/周六入睡时间明显偏晚</li>
+                </ul>
+                <h3>图表结论</h3>
+                <p>图表里最明显的特征是：周三睡眠结构最完整，次日恢复评分同步来到本周高点；周六总睡眠不足 6 小时后，恢复评分出现最明显下滑。</p>
+                <h3>恢复关联</h3>
+                <ul>
+                  <li>睡眠评分均值：79/100；恢复评分均值：74/100</li>
+                  <li>高负荷训练后 24h 内，静息心率平均抬升 +2 bpm</li>
+                  <li>当总睡眠低于 6h 40m 时，次日主观疲劳显著增加</li>
+                </ul>
+                <h3>简短解读</h3>
+                <p>你当前不是“睡得少”，而是“睡眠时间波动 + 高负荷日恢复不足”。这会直接影响高强度训练质量和户外长距离稳定性。</p>
+                <h3>建议</h3>
+                <ul>
+                  <li>把入睡时间窗口收敛到 23:00-23:30，连续执行 7 天</li>
+                  <li>高强度日后强制补 30-40 分钟低强度恢复活动</li>
+                  <li>若连续两天恢复评分 &lt; 70，第三天改为轻松跑/休息</li>
+                </ul>
+              </div>
+            </section>
+          </section>
+
+          <section class="conversation" data-chat-id="hongkong">
+            <div class="user-turn">@komoot 推荐几条香港的徒步路线给我。</div>
+
+            <section class="assistant-turn">
+              <p class="assistant-lead">我先直接帮你从 Komoot 找香港的徒步路线，优先给你几条适合入门到进阶都能选的。</p>
+              <div class="thinking">已思考 11s</div>
+
+              <div class="source-row">
+                <span class="source-dot" aria-hidden="true"></span>
+                <span>komoot</span>
+              </div>
+
+              <div class="cards">
+                <a href="#" class="route-card" data-demo-target="Komoot 路线详情">
+                  <div class="cover easy"><span class="badge easy">Easy</span></div>
+                  <div class="route-meta">📍 Hong Kong, China</div>
+                  <div class="route-title">Banyan Tree Park – Lugard Falls loop from ...</div>
+                  <div class="route-stats">↔ 2.65 mi ・ ◴ 01:17 h ・ ☆ 4.9</div>
+                </a>
+
+                <a href="#" class="route-card" data-demo-target="Komoot 路线详情">
+                  <div class="cover hard"><span class="badge hard">Hard</span></div>
+                  <div class="route-meta">📍 Hong Kong, China</div>
+                  <div class="route-title">Lugard Falls – Banyan Tree Park loop from L...</div>
+                  <div class="route-stats">↔ 7.51 mi ・ ◴ 03:56 h ・ ☆ 4.8</div>
+                </a>
+
+                <a href="#" class="route-card" data-demo-target="Komoot 路线详情">
+                  <div class="cover moderate"><span class="badge moderate">Moderate</span></div>
+                  <div class="route-meta">📍 Hong Kong, China</div>
+                  <div class="route-title">Lion Rock Summit – Lion Rock (Lion's Head) loo...</div>
+                  <div class="route-stats">↔ 5.22 mi ・ ◴ 02:59 h ・ ☆ 4.6</div>
+                </a>
+              </div>
+
+              <hr class="paragraph-divider" />
+
+              <div class="assistant-body">
+                <p>我给你找了一批香港附近的热门徒步路线，里面有海岸线、山脊线和城市近郊路线，强度从相对轻松到偏进阶都有。你可以先看上面的路线卡片挑方向。</p>
+              </div>
+            </section>
+
+            <div class="user-turn followup">@Coros 结合我的体能模型，分析一下我大概要用多久时间能走完这条路线。</div>
+
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>路线耗时 · 体能模型估算</span></div>
+              <p class="assistant-lead">已调用 Coros 体能模型（近 8 周跑步负荷 + 徒步历史 + 恢复状态）对你选中的路线进行估算。</p>
+              <div class="thinking">已思考 9s</div>
+
+              <div class="assistant-body">
+                <h3>时间预估</h3>
+                <ul>
+                  <li>稳态完成：3h 45m - 4h 20m</li>
+                  <li>保守完成（含拍照/补给）：4h 30m - 5h 05m</li>
+                </ul>
+                <h3>模型依据</h3>
+                <ul>
+                  <li>你的最近 30 天上坡效率高于同配速人群约 11%</li>
+                  <li>长距离后半程心率漂移控制较好（均值 6.8%）</li>
+                  <li>近 7 天恢复评分均值 74/100，属于可完成强度</li>
+                </ul>
+                <h3>执行建议</h3>
+                <p>如果你希望把体感压力控制在舒适区间，建议按 4h 30m 左右去规划补给和停留点；若当天气温偏高或前一晚恢复不足，优先参考保守区间。</p>
+              </div>
+            </section>
+          </section>
+
+          <section class="conversation active" data-chat-id="analysis">
+            <div class="file-chip">
+              <div class="file-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path>
+                  <path d="M14 2v5h5"></path>
+                </svg>
+              </div>
+              <div>
+                <div class="file-name">武功山反穿.kml</div>
+                <div class="file-type">文件</div>
+              </div>
+            </div>
+            <div class="user-turn">@Coros 结合我的体能模型，分析一下我大概要用多久时间能走完这条路线。</div>
+
+            <section class="assistant-turn">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>KML 路线解析 · 体能模型估算</span></div>
+              <p class="assistant-lead">我已按 Coros 体能模型 + 这份 KML 的地形参数重算你的完赛时间。模型考虑了你近 8 周训练量、静息心率趋势和最近恢复状态。</p>
+              <div class="thinking">已思考 5m 35s</div>
+
+              <div class="assistant-body">
+                <h3>时间预估</h3>
+                <ul>
+                  <li>理想状态（轻装、停留少）：10h 10m - 11h 05m</li>
+                  <li>常规完成（拍照 + 正常补给）：11h 20m - 12h 40m</li>
+                  <li>保守完成（重装/天气一般）：13h 00m - 14h 20m</li>
+                </ul>
+                <p>如果你要把风险和疲劳控制在合理区间，建议按两日完成，会明显更稳。</p>
+              </div>
+
+              <hr class="paragraph-divider" />
+
+              <div class="assistant-body">
+                <h3>模型依据</h3>
+                <ul>
+                  <li>KML 线路：24.43 km，累计爬升约 2200 m</li>
+                  <li>你的上坡效率：高于个体近 90 天均值约 8%</li>
+                  <li>恢复评分：过去 7 天均值 73/100，存在轻微波动</li>
+                  <li>下坡段疲劳敏感：连续长下坡后配速衰减更明显</li>
+                </ul>
+                <h3>执行建议</h3>
+                <p>如果你的目标是单日完成，建议按“常规完成”区间做补给、出发时间和天气预案；如果更看重体验与安全，两日完成会更符合你当前模型下的稳定输出能力。</p>
+              </div>
+            </section>
+          </section>
+
+          <div class="composer-wrap">
+            <form class="composer" action="#" onsubmit="return false">
+              <textarea class="composer-input">@Coros 结合我的体能模型，分析一下我大概要用多久时间能走完这条路线</textarea>
+
+              <div class="composer-actions">
+                <div class="composer-left">
+                  <button class="composer-btn" type="button" aria-label="添加">＋</button>
+                  <span class="thinking-pill">◌ 思考 ˅</span>
+                  <span class="source-pill">● Coros</span>
+                </div>
+
+                <div class="composer-right">
+                  <button class="composer-btn" type="button" aria-label="听写">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v10" /><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 10a7 7 0 0 0 14 0" /><path d="M12 17v4" /></svg>
+                  </button>
+                  <button class="voice-btn" type="button" aria-label="发送">↑</button>
+                </div>
+              </div>
+            </form>
+
+            <div class="disclaimer" id="disclaimerText">
+              ChatGPT 也可能会犯错。请核查重要信息。查看&nbsp;<a href="#" data-demo-target="Cookie 首选项">Cookie 首选项</a>。
+            </div>
+          </div>
+        </main>
+        </div>
+
+        <section class="view view-apps" data-view="apps">
+          <div class="apps-page" id="appsPageContainer">
+            <div class="apps-head">
+              <h1>探索应用</h1>
+              <p>连接你常用的服务，直接在 ChatGPT 中完成搜索、总结、协作与自动化工作流。</p>
+            </div>
+
+            <input class="apps-search" type="text" placeholder="搜索应用，如 Notion、Canva、GitHub..." />
+
+            <div class="apps-cats">
+              <button class="active" type="button">全部</button>
+              <button type="button">效率</button>
+              <button type="button">开发者工具</button>
+              <button type="button">设计</button>
+              <button type="button">协作</button>
+              <button type="button">数据分析</button>
+            </div>
+
+            <div class="apps-grid">
+              <article class="app-card clickable" data-open-app="coros">
+                <div class="app-top">
+                  <div class="app-icon">CR</div>
+                  <div>
+                    <div class="app-name">Coros</div>
+                    <div class="app-by">企业内部应用</div>
+                  </div>
+                </div>
+                <p class="app-desc">读取活动、睡眠、设备与 EvoLab 指标，支持训练负荷、恢复状态、FTP 与路线完赛时间联动分析。</p>
+                <div class="app-meta"><span>数据分析 · 健身智能</span><span>New</span></div>
+              </article>
+
+              <article class="app-card clickable" data-demo-target="GitHub 应用">
+                <div class="app-top">
+                  <div class="app-icon">GH</div>
+                  <div>
+                    <div class="app-name">GitHub</div>
+                    <div class="app-by">官方连接器</div>
+                  </div>
+                </div>
+                <p class="app-desc">搜索仓库、读取 PR 讨论、定位 issue 变更点，快速生成代码上下文摘要。</p>
+                <div class="app-meta"><span>开发者工具</span><span>4.9 ★</span></div>
+              </article>
+
+              <article class="app-card clickable" data-demo-target="Notion 应用">
+                <div class="app-top">
+                  <div class="app-icon">NT</div>
+                  <div>
+                    <div class="app-name">Notion</div>
+                    <div class="app-by">官方连接器</div>
+                  </div>
+                </div>
+                <p class="app-desc">跨页面检索笔记、会议记录和项目文档，把零散信息汇总成可执行清单。</p>
+                <div class="app-meta"><span>效率</span><span>4.8 ★</span></div>
+              </article>
+
+              <article class="app-card clickable" data-demo-target="Canva 应用">
+                <div class="app-top">
+                  <div class="app-icon">CV</div>
+                  <div>
+                    <div class="app-name">Canva</div>
+                    <div class="app-by">官方连接器</div>
+                  </div>
+                </div>
+                <p class="app-desc">生成设计文案、整理视觉方向并将方案同步到 Canva，减少往返沟通成本。</p>
+                <div class="app-meta"><span>设计</span><span>4.7 ★</span></div>
+              </article>
+
+              <article class="app-card clickable" data-demo-target="Slack 应用">
+                <div class="app-top">
+                  <div class="app-icon">SL</div>
+                  <div>
+                    <div class="app-name">Slack</div>
+                    <div class="app-by">官方连接器</div>
+                  </div>
+                </div>
+                <p class="app-desc">汇总频道决策、提炼行动项、生成 standup 更新，减少信息遗漏。</p>
+                <div class="app-meta"><span>协作</span><span>4.8 ★</span></div>
+              </article>
+
+              <article class="app-card clickable" data-demo-target="Google Drive 应用">
+                <div class="app-top">
+                  <div class="app-icon">GD</div>
+                  <div>
+                    <div class="app-name">Google Drive</div>
+                    <div class="app-by">官方连接器</div>
+                  </div>
+                </div>
+                <p class="app-desc">从文档与表格中抽取关键结论，自动对比版本差异并输出结构化摘要。</p>
+                <div class="app-meta"><span>效率</span><span>4.7 ★</span></div>
+              </article>
+
+              <article class="app-card clickable" data-demo-target="Linear 应用">
+                <div class="app-top">
+                  <div class="app-icon">LX</div>
+                  <div>
+                    <div class="app-name">Linear</div>
+                    <div class="app-by">社区应用</div>
+                  </div>
+                </div>
+                <p class="app-desc">读取冲刺任务、自动生成进度说明，帮助你快速定位阻塞项与优先级。</p>
+                <div class="app-meta"><span>开发者工具</span><span>4.6 ★</span></div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="view view-app-detail" data-view="app-detail">
+          <div class="app-detail" id="appDetailContainer">
+            <button class="back-btn" type="button" data-back-to-apps>← 返回应用</button>
+
+            <article class="app-detail-card">
+              <div class="app-detail-head">
+                <div class="app-icon">CR</div>
+                <div>
+                  <h2>Coros</h2>
+                  <p>企业内部应用 · 数据分析</p>
+                </div>
+              </div>
+
+              <div class="app-detail-body">
+                <p>Coros 应用用于读取和分析 COROS 生态中的核心数据，包括活动记录、睡眠、恢复、训练状态、设备资产，以及 EvoLab 生成的训练指标。</p>
+                <div class="scope-tags">
+                  <span>活动记录</span>
+                  <span>睡眠质量</span>
+                  <span>EvoLab 训练状态</span>
+                  <span>Recovery Timer</span>
+                  <span>FTP / Race Predictor</span>
+                  <span>设备资产</span>
+                </div>
+                <p>你可以直接在对话中发起如下请求：</p>
+                <ul>
+                  <li>查询指定用户在某时间段的跑步/骑行总量和活动消耗</li>
+                  <li>分析最近 7 天或 30 天睡眠趋势，并输出图表与恢复结论</li>
+                  <li>对比 7 日 Load Impact 与 42 日 Base Fitness，生成训练建议</li>
+                  <li>结合路线距离、爬升和用户能力模型，估算徒步/越野完赛时间</li>
+                </ul>
+                <div class="prompt-chips">
+                  <span>@Coros 查我近 30 天的训练负荷</span>
+                  <span>@Coros 分析最近 7 天睡眠与恢复</span>
+                  <span>@Coros 结合体能模型估算路线耗时</span>
+                </div>
+                <div class="privacy-box">
+                  <strong>授权范围</strong>
+                  <p>用户通过 COROS App 扫码后授权。ChatGPT 仅在用户确认的数据范围内读取活动、睡眠、设备与训练指标，取消授权入口位于 App 的「设置 - 第三方 APP」。</p>
+                </div>
+              </div>
+
+              <div class="app-detail-actions">
+                <button class="primary" type="button" data-connect-coros>连接应用</button>
+                <button type="button">查看文档</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view view-demo" data-view="demo">
+          <div class="demo-view" id="demoViewContainer">
+            <article class="demo-card">
+              <div class="demo-mark">◎</div>
+              <h2>这是一个 COROS MCP 产品 Demo</h2>
+              <p>当前页面是演示占位内容。你可以点击「应用」模拟连接 <strong>Coros</strong>，或点击左侧对话，查看与 Coros MCP 的查询和分析效果。</p>
+              <p>如需了解背景、目标或接入方案，可联系产品经理 @许志翔。</p>
+              <div class="demo-actions">
+                <button class="demo-action primary" type="button" data-demo-action="apps">打开应用页</button>
+                <button class="demo-action" type="button" data-demo-action="coros-basic">查看 Coros 对话</button>
+              </div>
+              <div class="demo-context" id="demoContext">当前入口：产品演示占位页</div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <div class="auth-modal" id="corosAuthModal" aria-hidden="true">
+    <div class="auth-panel" role="dialog" aria-modal="true" aria-labelledby="corosAuthTitle" id="authPanelContainer">
+      <div class="auth-head">
+        <h3 id="corosAuthTitle">连接 Coros 应用</h3>
+        <button class="auth-close" type="button" data-close-auth aria-label="关闭">×</button>
+      </div>
+
+      <p class="auth-desc">请使用 <strong>COROS App</strong> 扫码完成授权。授权后，ChatGPT 将可在你允许的范围内读取活动、睡眠与设备数据。</p>
+
+      <div class="auth-body">
+        <div class="qr" aria-hidden="true">
+          <span class="qr-finder tl"></span>
+          <span class="qr-finder tr"></span>
+          <span class="qr-finder bl"></span>
+          <span class="qr-noise n1"></span>
+          <span class="qr-noise n2"></span>
+          <span class="qr-noise n3"></span>
+          <span class="qr-noise n4"></span>
+          <span class="qr-noise n5"></span>
+          <span class="qr-noise n6"></span>
+          <span class="qr-noise n7"></span>
+          <span class="qr-noise n8"></span>
+          <span class="qr-noise n9"></span>
+          <span class="qr-noise n10"></span>
+          <span class="qr-noise n11"></span>
+          <span class="qr-noise n12"></span>
+          <span class="qr-noise n13"></span>
+          <span class="qr-noise n14"></span>
+        </div>
+        <ol class="auth-steps">
+          <li>打开手机上的 COROS App</li>
+          <li>进入「我」的页面，点击二维码扫描器</li>
+          <li>扫描左侧二维码</li>
+          <li>确认数据范围后完成绑定</li>
+        </ol>
+      </div>
+
+      <div class="auth-note">
+        <span>可在 App 的「设置 - 第三方 APP」中随时取消授权。</span>
+        <button class="ok" type="button" data-close-auth>我知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const corosAuthModal = document.getElementById("corosAuthModal");
+    const langToggle = document.getElementById("langToggle");
+    const appsPageContainer = document.getElementById("appsPageContainer");
+    const appDetailContainer = document.getElementById("appDetailContainer");
+    const demoViewContainer = document.getElementById("demoViewContainer");
+    const authPanelContainer = document.getElementById("authPanelContainer");
+
+    let views = [];
+    let navButtons = [];
+    let chatButtons = [];
+    let conversations = [];
+    let appOpeners = [];
+    let appBackButtons = [];
+    let connectCorosButtons = [];
+    let closeAuthButtons = [];
+    let demoTargets = [];
+    let demoActions = [];
+    let composerInput = null;
+
+    let currentLanguage = localStorage.getItem("coros-demo-language") || "zh";
+    let currentView = document.querySelector("[data-view].active")?.dataset.view || "chat";
+    let currentChat = document.querySelector(".conversation.active")?.dataset.chatId || "analysis";
+
+    const conversationSeedZh = {
+      "coros-basic": document.querySelector('[data-chat-id="coros-basic"]').innerHTML,
+      "sleep-analysis": document.querySelector('[data-chat-id="sleep-analysis"]').innerHTML,
+      hongkong: document.querySelector('[data-chat-id="hongkong"]').innerHTML,
+      analysis: document.querySelector('[data-chat-id="analysis"]').innerHTML
+    };
+
+    const appsPageSeedZh = appsPageContainer.innerHTML;
+    const appDetailSeedZh = appDetailContainer.innerHTML;
+    const demoViewSeedZh = demoViewContainer.innerHTML;
+    const authPanelSeedZh = authPanelContainer.innerHTML;
+
+    const uiCopy = {
+      zh: {
+        labelNewChat: "新聊天",
+        labelSearchChats: "搜索聊天",
+        labelImages: "图片",
+        labelApps: "应用",
+        labelDeepResearch: "深度研究",
+        labelGpts: "GPT",
+        menuTitleProjects: "项目",
+        menuTitleChats: "你的聊天",
+        modelModeLabel: "Thinking",
+        shareLabel: "分享",
+        disclaimer:
+          'ChatGPT 也可能会犯错。请核查重要信息。查看&nbsp;<a href="#" data-demo-target="Cookie 首选项">Cookie 首选项</a>。',
+        chatLabels: {
+          "coros-basic": "Coros基本数据查询",
+          "sleep-analysis": "睡眠数据分析",
+          hongkong: "香港徒步路线推荐",
+          analysis: "路线分析与预计时间"
+        },
+        projectItems: ["⊞ 新项目", "☐ Coros MCP & Agent", "☐ Coros-Link"],
+        userPlan: "Plus",
+        thinkingPill: "◌ 思考 ˅"
+      },
+      en: {
+        labelNewChat: "New chat",
+        labelSearchChats: "Search chats",
+        labelImages: "Images",
+        labelApps: "Apps",
+        labelDeepResearch: "Deep Research",
+        labelGpts: "GPTs",
+        menuTitleProjects: "Projects",
+        menuTitleChats: "Your chats",
+        modelModeLabel: "Thinking",
+        shareLabel: "Share",
+        disclaimer:
+          'ChatGPT can make mistakes. Check important info. See&nbsp;<a href="#" data-demo-target="Cookie preferences">Cookie Preferences</a>.',
+        chatLabels: {
+          "coros-basic": "Coros Data Queries",
+          "sleep-analysis": "Sleep Analysis",
+          hongkong: "Hong Kong Hike Ideas",
+          analysis: "Route Timing Estimate"
+        },
+        projectItems: ["⊞ New project", "☐ Coros MCP & Agent", "☐ Coros-Link"],
+        userPlan: "Plus",
+        thinkingPill: "◌ Reason ˅"
+      }
+    };
+
+    const composerDraftsByLang = {
+      zh: {
+        "coros-basic": "@Coros 拉取我近 30 天的训练与恢复摘要",
+        "sleep-analysis": "@Coros 分析我近 7 天睡眠和恢复关系",
+        hongkong: "@Coros 结合我的体能模型，分析一下我大概要用多久时间能走完这条路线",
+        analysis: "@Coros 结合我的体能模型，分析一下我大概要用多久时间能走完这条路线"
+      },
+      en: {
+        "coros-basic": "@Coros pull a summary of my training and recovery over the last 30 days",
+        "sleep-analysis": "@Coros analyze my sleep and recovery trends for the last 7 days",
+        hongkong: "@Coros estimate how long it would take me to finish this route based on my fitness model",
+        analysis: "@Coros estimate how long it would take me to finish this route based on my fitness model"
+      }
+    };
+
+    const templates = {
+      appsPage: {
+        zh: appsPageSeedZh,
+        en: `
+          <div class="apps-head">
+            <h1>Explore apps</h1>
+            <p>Connect the services you already use and run search, summarization, collaboration, and automation workflows directly inside ChatGPT.</p>
+          </div>
+
+          <input class="apps-search" type="text" placeholder="Search apps like Notion, Canva, or GitHub..." />
+
+          <div class="apps-cats">
+            <button class="active" type="button">All</button>
+            <button type="button">Productivity</button>
+            <button type="button">Developer tools</button>
+            <button type="button">Design</button>
+            <button type="button">Collaboration</button>
+            <button type="button">Analytics</button>
+          </div>
+
+          <div class="apps-grid">
+            <article class="app-card clickable" data-open-app="coros">
+              <div class="app-top">
+                <div class="app-icon">CR</div>
+                <div>
+                  <div class="app-name">Coros</div>
+                  <div class="app-by">Internal app</div>
+                </div>
+              </div>
+              <p class="app-desc">Read activity, sleep, device, and EvoLab metrics, then combine them with training load, recovery status, FTP, and route completion analysis.</p>
+              <div class="app-meta"><span>Analytics · Fitness intelligence</span><span>New</span></div>
+            </article>
+
+            <article class="app-card clickable" data-demo-target="GitHub app">
+              <div class="app-top">
+                <div class="app-icon">GH</div>
+                <div>
+                  <div class="app-name">GitHub</div>
+                  <div class="app-by">Official connector</div>
+                </div>
+              </div>
+              <p class="app-desc">Search repositories, read PR discussions, locate issue deltas, and quickly assemble code context summaries.</p>
+              <div class="app-meta"><span>Developer tools</span><span>4.9 ★</span></div>
+            </article>
+
+            <article class="app-card clickable" data-demo-target="Notion app">
+              <div class="app-top">
+                <div class="app-icon">NT</div>
+                <div>
+                  <div class="app-name">Notion</div>
+                  <div class="app-by">Official connector</div>
+                </div>
+              </div>
+              <p class="app-desc">Search across notes, meeting logs, and project docs, then turn scattered information into an actionable summary.</p>
+              <div class="app-meta"><span>Productivity</span><span>4.8 ★</span></div>
+            </article>
+
+            <article class="app-card clickable" data-demo-target="Canva app">
+              <div class="app-top">
+                <div class="app-icon">CV</div>
+                <div>
+                  <div class="app-name">Canva</div>
+                  <div class="app-by">Official connector</div>
+                </div>
+              </div>
+              <p class="app-desc">Generate copy, shape visual directions, and sync creative ideas back into Canva with less coordination overhead.</p>
+              <div class="app-meta"><span>Design</span><span>4.7 ★</span></div>
+            </article>
+
+            <article class="app-card clickable" data-demo-target="Slack app">
+              <div class="app-top">
+                <div class="app-icon">SL</div>
+                <div>
+                  <div class="app-name">Slack</div>
+                  <div class="app-by">Official connector</div>
+                </div>
+              </div>
+              <p class="app-desc">Summarize channel decisions, extract next steps, and draft standup updates without losing critical context.</p>
+              <div class="app-meta"><span>Collaboration</span><span>4.8 ★</span></div>
+            </article>
+
+            <article class="app-card clickable" data-demo-target="Google Drive app">
+              <div class="app-top">
+                <div class="app-icon">GD</div>
+                <div>
+                  <div class="app-name">Google Drive</div>
+                  <div class="app-by">Official connector</div>
+                </div>
+              </div>
+              <p class="app-desc">Extract insights from docs and spreadsheets, compare versions, and produce structured summaries automatically.</p>
+              <div class="app-meta"><span>Productivity</span><span>4.7 ★</span></div>
+            </article>
+
+            <article class="app-card clickable" data-demo-target="Linear app">
+              <div class="app-top">
+                <div class="app-icon">LX</div>
+                <div>
+                  <div class="app-name">Linear</div>
+                  <div class="app-by">Community app</div>
+                </div>
+              </div>
+              <p class="app-desc">Read sprint tasks, summarize status, and highlight blockers and priorities for faster planning reviews.</p>
+              <div class="app-meta"><span>Developer tools</span><span>4.6 ★</span></div>
+            </article>
+          </div>
+        `
+      },
+      appDetail: {
+        zh: appDetailSeedZh,
+        en: `
+          <button class="back-btn" type="button" data-back-to-apps>← Back to apps</button>
+
+          <article class="app-detail-card">
+            <div class="app-detail-head">
+              <div class="app-icon">CR</div>
+              <div>
+                <h2>Coros</h2>
+                <p>Internal app · Analytics</p>
+              </div>
+            </div>
+
+            <div class="app-detail-body">
+              <p>The Coros app reads and analyzes core data from the COROS ecosystem, including activities, sleep, recovery, training status, device assets, and EvoLab-derived performance metrics.</p>
+              <div class="scope-tags">
+                <span>Activities</span>
+                <span>Sleep quality</span>
+                <span>EvoLab training state</span>
+                <span>Recovery Timer</span>
+                <span>FTP / Race Predictor</span>
+                <span>Device assets</span>
+              </div>
+              <p>You can ask for things like:</p>
+              <ul>
+                <li>Pull running and cycling totals or caloric burn for a selected date range</li>
+                <li>Analyze 7-day or 30-day sleep trends with charts and recovery conclusions</li>
+                <li>Compare 7-day Load Impact against 42-day Base Fitness and generate training guidance</li>
+                <li>Estimate hiking or trail completion time using route distance, elevation gain, and a user fitness model</li>
+              </ul>
+              <div class="prompt-chips">
+                <span>@Coros check my training load over the last 30 days</span>
+                <span>@Coros analyze my sleep and recovery from the last 7 days</span>
+                <span>@Coros estimate route duration using my fitness model</span>
+              </div>
+              <div class="privacy-box">
+                <strong>Permission scope</strong>
+                <p>Users authorize access by scanning a QR code in the COROS App. ChatGPT reads only the activity, sleep, device, and training metrics explicitly approved by the user. Access can be revoked in the app under Settings - Third-party Apps.</p>
+              </div>
+            </div>
+
+            <div class="app-detail-actions">
+              <button class="primary" type="button" data-connect-coros>Connect app</button>
+              <button type="button">View docs</button>
+            </div>
+          </article>
+        `
+      },
+      demoView: {
+        zh: demoViewSeedZh,
+        en: `
+          <article class="demo-card">
+            <div class="demo-mark">◎</div>
+            <h2>This is a COROS MCP product demo</h2>
+            <p>This page is placeholder demo content. Open <strong>Apps</strong> to simulate connecting Coros, or switch to one of the conversations in the sidebar to review COROS MCP query and analysis flows.</p>
+            <p>For more details on the product background, goals, or integration plan, contact product manager @Xuzhixiang.</p>
+            <div class="demo-actions">
+              <button class="demo-action primary" type="button" data-demo-action="apps">Open apps</button>
+              <button class="demo-action" type="button" data-demo-action="coros-basic">Open Coros chat</button>
+            </div>
+            <div class="demo-context">Demo placeholder page</div>
+          </article>
+        `
+      },
+      authPanel: {
+        zh: authPanelSeedZh,
+        en: `
+          <div class="auth-head">
+            <h3 id="corosAuthTitle">Connect Coros</h3>
+            <button class="auth-close" type="button" data-close-auth aria-label="Close">×</button>
+          </div>
+
+          <p class="auth-desc">Use the <strong>COROS App</strong> to scan this code and grant access. After authorization, ChatGPT can read the activity, sleep, and device data that you approve.</p>
+
+          <div class="auth-body">
+            <div class="qr" aria-hidden="true">
+              <span class="qr-finder tl"></span>
+              <span class="qr-finder tr"></span>
+              <span class="qr-finder bl"></span>
+              <span class="qr-noise n1"></span>
+              <span class="qr-noise n2"></span>
+              <span class="qr-noise n3"></span>
+              <span class="qr-noise n4"></span>
+              <span class="qr-noise n5"></span>
+              <span class="qr-noise n6"></span>
+              <span class="qr-noise n7"></span>
+              <span class="qr-noise n8"></span>
+              <span class="qr-noise n9"></span>
+              <span class="qr-noise n10"></span>
+              <span class="qr-noise n11"></span>
+              <span class="qr-noise n12"></span>
+              <span class="qr-noise n13"></span>
+              <span class="qr-noise n14"></span>
+            </div>
+            <ol class="auth-steps">
+              <li>Open the COROS App on your phone</li>
+              <li>Go to the “Me” page and tap the QR scanner</li>
+              <li>Scan the QR code on the left</li>
+              <li>Confirm the data scope to finish linking</li>
+            </ol>
+          </div>
+
+          <div class="auth-note">
+            <span>You can revoke access anytime in the app under Settings - Third-party Apps.</span>
+            <button class="ok" type="button" data-close-auth>Got it</button>
+          </div>
+        `
+      },
+      conversations: {
+        zh: conversationSeedZh,
+        en: {
+          "coros-basic": `
+            <div class="user-turn">@Coros first, pull my activity history.</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>Activities · live read</span></div>
+              <div class="assistant-body">
+                <h3>Overview</h3>
+                <p>Your recent 30-day history is synced. You completed 42 workouts totaling 46h 12m, with running and cycling contributing most of the load. The cards below summarize the last 7 days and are a good starting point for a deeper drill-down.</p>
+              </div>
+              <div class="workout-cards">
+                <article class="workout-card">
+                  <div class="workout-card-head">
+                    <div class="workout-card-title">Clear Water Bay endurance run</div>
+                    <span class="workout-card-type">Run</span>
+                  </div>
+                  <div class="workout-card-meta">
+                    <span>Yesterday</span>
+                    <span>14.2 km</span>
+                    <span>1h 18m</span>
+                    <span>Avg HR 148 bpm</span>
+                  </div>
+                </article>
+                <article class="workout-card">
+                  <div class="workout-card-head">
+                    <div class="workout-card-title">Tai Mo Shan climbing ride</div>
+                    <span class="workout-card-type">Ride</span>
+                  </div>
+                  <div class="workout-card-meta">
+                    <span>3 days ago</span>
+                    <span>52.4 km</span>
+                    <span>2h 06m</span>
+                    <span>Elevation 812 m</span>
+                  </div>
+                </article>
+                <article class="workout-card">
+                  <div class="workout-card-head">
+                    <div class="workout-card-title">MacLehose recovery hike</div>
+                    <span class="workout-card-type">Hike</span>
+                  </div>
+                  <div class="workout-card-meta">
+                    <span>6 days ago</span>
+                    <span>9.8 km</span>
+                    <span>2h 31m</span>
+                    <span>Avg pace 15'23"/km</span>
+                  </div>
+                </article>
+                <article class="workout-card">
+                  <div class="workout-card-head">
+                    <div class="workout-card-title">Sai Kung easy run</div>
+                    <span class="workout-card-type">Run</span>
+                  </div>
+                  <div class="workout-card-meta">
+                    <span>7 days ago</span>
+                    <span>8.6 km</span>
+                    <span>48m</span>
+                    <span>Load 86</span>
+                  </div>
+                </article>
+                <article class="workout-card workout-more-card">
+                  <div class="workout-card-head">
+                    <div class="workout-card-title">See more</div>
+                    <span class="workout-card-type">COROS App</span>
+                  </div>
+                  <p>Open the COROS App to view the full 7-day activity list, workout detail pages, routes, and EvoLab metrics for each session.</p>
+                  <a class="workout-more-link" href="javascript:void(0)">Open activity history ›</a>
+                </article>
+              </div>
+              <div class="assistant-body">
+                <h3>Quick read</h3>
+                <p>The last 7 days are balanced around two runs, one ride, and one hike. That pattern suggests you are maintaining both aerobic base and climbing adaptation. The latest run and ride both landed in the medium-to-high quality range.</p>
+              </div>
+            </section>
+
+            <div class="user-turn followup">@Coros now show my workout calories.</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>Calories · training summary</span></div>
+              <div class="assistant-body">
+                <h3>Overview</h3>
+                <p>Total workout burn over the last 30 days is 28,640 kcal, with an average of 682 kcal per session. The highest single-session burn in the last 7 days was the Tai Mo Shan climbing ride at 1,124 kcal.</p>
+                <h3>By sport</h3>
+                <ul>
+                  <li>Running: highest burn rate per unit time, average 742 kcal per session</li>
+                  <li>Cycling: highest total calorie contribution due to longer session duration</li>
+                  <li>Hiking: steadier burn profile, useful for recovery weeks and low-impact load</li>
+                </ul>
+                <h3>Quick read</h3>
+                <p>Your current calorie profile is driven mainly by running and cycling. That matches a mixed endurance focus. To control fatigue, treat high-burn rides as sessions that should be followed by low-impact recovery work.</p>
+              </div>
+            </section>
+
+            <div class="user-turn followup">@Coros check my heart rate and resting heart rate too.</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>Heart rate · resting heart rate</span></div>
+              <div class="assistant-body">
+                <h3>Workout heart rate</h3>
+                <p>Average exercise heart rate is 142 bpm. Time in Z4-Z5 accounts for 21%, which indicates a relatively high share of quality work during the last week.</p>
+                <h3>Resting heart rate trend</h3>
+                <p>Your 7-day average resting heart rate is 48 bpm, up by 1.8 bpm versus the previous 7 days. The change is still small, but it starts to reflect accumulating recovery stress.</p>
+                <h3>Risk signal</h3>
+                <p>If resting HR continues to rise over the next 3 days while recovery scores trend down, reduce session density and avoid stacking high-quality workouts too closely.</p>
+              </div>
+            </section>
+
+            <div class="user-turn followup">@Coros give me recovery and training load status as well.</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>EvoLab · recovery and training state</span></div>
+              <div class="assistant-body">
+                <h3>Recovery status</h3>
+                <p>Your average recovery score is 73/100. The last 3 days trended down, but not into an abnormal zone. This looks more like cumulative training stress than a single outlier event.</p>
+                <h3>Training load</h3>
+                <p>7-day load is 684, near the top end of your Optimized range. Against your 42-day Base Fitness, the load is still manageable, but close to your recent stable ceiling.</p>
+                <h3>Current assessment</h3>
+                <p>Keep frequency stable, but avoid increasing the share of high-intensity sessions. A better mix now is one key session plus easier runs, recovery rides, or low-intensity hiking.</p>
+              </div>
+            </section>
+
+            <div class="user-turn followup">@Coros what about running ability, cycling ability, and my PRs?</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>Ability profile · records</span></div>
+              <div class="assistant-body">
+                <h3>Running ability</h3>
+                <p>VO2Max is 54 and predicted marathon time is 3:24:40. That points to a stable aerobic base and mature long-distance pacing control.</p>
+                <h3>Cycling ability</h3>
+                <p>FTP is 236W (3.28 W/kg), up 6W over the last 4 weeks. Climbing output stability is improving versus the previous cycle.</p>
+                <h3>Personal records</h3>
+                <ul>
+                  <li>5K: 20:31</li>
+                  <li>10K: 43:48</li>
+                  <li>Half marathon: 1:39:12</li>
+                </ul>
+                <h3>Quick read</h3>
+                <p>Your profile is best described as mixed-endurance: running is the primary strength, cycling is improving sustained power and climbing durability, and both support trail, hiking, and multi-sport analysis well.</p>
+              </div>
+            </section>
+
+            <div class="user-turn followup">@Coros finally, check device status: number of devices, warranty, and Bluetooth IDs.</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>Device assets · account binding</span></div>
+              <div class="assistant-body">
+                <h3>Device overview</h3>
+                <p>Your account currently has 2 devices bound: VERTIX 2S and PACE 3. Both are in normal active use.</p>
+                <h3>Warranty status</h3>
+                <ul>
+                  <li>VERTIX 2S: covered through 2027-05-18, support status normal</li>
+                  <li>PACE 3: covered through 2026-11-02, support status normal</li>
+                </ul>
+                <h3>Identification info</h3>
+                <p>The Bluetooth IDs are A4:C1:38:7D:91:2F and 7C:9E:BD:41:63:88. These are useful for connection diagnostics and support-side device tracing.</p>
+                <h3>Quick note</h3>
+                <p>If you need to unbind a device or manage third-party access, you can do it directly in the COROS App. Right now there are no warranty or binding risks visible on either device.</p>
+              </div>
+            </section>
+          `,
+          "sleep-analysis": `
+            <div class="user-turn">@Coros check my sleep over the last 7 days and analyze my recovery state.</div>
+
+            <section class="assistant-turn">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>Sleep quality · recovery analysis</span></div>
+              <p class="assistant-lead">I aligned your 7-day sleep and recovery metrics and summarized them first, then added practical guidance.</p>
+              <div class="thinking">Reasoned for 12s</div>
+
+              <div class="metric-strip">
+                <div class="metric-tile">
+                  <div class="metric-tile-label">Avg sleep</div>
+                  <div class="metric-tile-value">7h 06m</div>
+                  <div class="metric-tile-sub">24 min below target</div>
+                </div>
+                <div class="metric-tile">
+                  <div class="metric-tile-label">Avg sleep score</div>
+                  <div class="metric-tile-value">79</div>
+                  <div class="metric-tile-sub">Good range</div>
+                </div>
+                <div class="metric-tile">
+                  <div class="metric-tile-label">Avg recovery score</div>
+                  <div class="metric-tile-value">74</div>
+                  <div class="metric-tile-sub">Thursday and Saturday dropped</div>
+                </div>
+              </div>
+
+              <div class="sleep-chart-card">
+                <div class="sleep-chart-head">
+                  <div>
+                    <div class="sleep-chart-title">7-day sleep and recovery trend</div>
+                    <div class="sleep-chart-sub">Sleep bars show duration and structure. The line tracks the next-day recovery score.</div>
+                  </div>
+                  <div class="sleep-chart-legend">
+                    <span><i class="legend-dot total"></i>Total sleep</span>
+                    <span><i class="legend-dot deep"></i>Deep sleep</span>
+                    <span><i class="legend-dot rem"></i>REM</span>
+                    <span><i class="legend-dot recovery"></i>Recovery</span>
+                  </div>
+                </div>
+                <svg class="sleep-chart" viewBox="0 0 760 280" aria-label="7-day sleep and recovery chart">
+                  <line x1="50" y1="36" x2="50" y2="220" stroke="#e8edf2" />
+                  <line x1="50" y1="220" x2="732" y2="220" stroke="#e8edf2" />
+                  <line x1="50" y1="82" x2="732" y2="82" stroke="#f4f6f8" />
+                  <line x1="50" y1="128" x2="732" y2="128" stroke="#f4f6f8" />
+                  <line x1="50" y1="174" x2="732" y2="174" stroke="#f4f6f8" />
+
+                  <text x="18" y="222" class="sleep-axis-label">0h</text>
+                  <text x="12" y="178" class="sleep-axis-label">3h</text>
+                  <text x="12" y="132" class="sleep-axis-label">6h</text>
+                  <text x="12" y="86" class="sleep-axis-label">9h</text>
+
+                  <g>
+                    <rect x="84" y="76" width="38" height="144" rx="10" fill="#eef2f6" />
+                    <rect x="84" y="189" width="38" height="31" rx="10" fill="#bcc7d5" />
+                    <rect x="84" y="162" width="38" height="27" rx="10" fill="#7d8ca1" />
+                    <rect x="178" y="88" width="38" height="132" rx="10" fill="#eef2f6" />
+                    <rect x="178" y="188" width="38" height="32" rx="10" fill="#bcc7d5" />
+                    <rect x="178" y="164" width="38" height="24" rx="10" fill="#7d8ca1" />
+                    <rect x="272" y="64" width="38" height="156" rx="10" fill="#eef2f6" />
+                    <rect x="272" y="190" width="38" height="30" rx="10" fill="#bcc7d5" />
+                    <rect x="272" y="158" width="38" height="32" rx="10" fill="#7d8ca1" />
+                    <rect x="366" y="108" width="38" height="112" rx="10" fill="#eef2f6" />
+                    <rect x="366" y="195" width="38" height="25" rx="10" fill="#bcc7d5" />
+                    <rect x="366" y="177" width="38" height="18" rx="10" fill="#7d8ca1" />
+                    <rect x="460" y="96" width="38" height="124" rx="10" fill="#eef2f6" />
+                    <rect x="460" y="194" width="38" height="26" rx="10" fill="#bcc7d5" />
+                    <rect x="460" y="172" width="38" height="22" rx="10" fill="#7d8ca1" />
+                    <rect x="554" y="120" width="38" height="100" rx="10" fill="#eef2f6" />
+                    <rect x="554" y="199" width="38" height="21" rx="10" fill="#bcc7d5" />
+                    <rect x="554" y="183" width="38" height="16" rx="10" fill="#7d8ca1" />
+                    <rect x="648" y="74" width="38" height="146" rx="10" fill="#eef2f6" />
+                    <rect x="648" y="190" width="38" height="30" rx="10" fill="#bcc7d5" />
+                    <rect x="648" y="160" width="38" height="30" rx="10" fill="#7d8ca1" />
+                  </g>
+
+                  <polyline fill="none" stroke="#5f6c82" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" points="103,96 197,90 291,82 385,120 479,102 573,132 667,92" />
+                  <g fill="#5f6c82">
+                    <circle cx="103" cy="96" r="3.6" />
+                    <circle cx="197" cy="90" r="3.6" />
+                    <circle cx="291" cy="82" r="3.6" />
+                    <circle cx="385" cy="120" r="3.6" />
+                    <circle cx="479" cy="102" r="3.6" />
+                    <circle cx="573" cy="132" r="3.6" />
+                    <circle cx="667" cy="92" r="3.6" />
+                  </g>
+
+                  <text x="88" y="246" class="sleep-axis-label">Mon</text>
+                  <text x="182" y="246" class="sleep-axis-label">Tue</text>
+                  <text x="276" y="246" class="sleep-axis-label">Wed</text>
+                  <text x="370" y="246" class="sleep-axis-label">Thu</text>
+                  <text x="464" y="246" class="sleep-axis-label">Fri</text>
+                  <text x="558" y="246" class="sleep-axis-label">Sat</text>
+                  <text x="652" y="246" class="sleep-axis-label">Sun</text>
+
+                </svg>
+                <div class="sleep-chart-caption">
+                  <span>Wednesday shows the most complete sleep structure and also the strongest next-day recovery score.</span>
+                  <span>Saturday falls below 6 hours of sleep and marks the clearest recovery drop of the week.</span>
+                </div>
+              </div>
+
+              <div class="assistant-body">
+                <h3>Overview</h3>
+                <ul>
+                  <li>Average total sleep: 7h 06m (target 7h 30m, short by 24m)</li>
+                  <li>Average sleep onset: 18m; nighttime awakenings: 1.6 per night</li>
+                  <li>Average deep sleep: 1h 24m; average REM: 1h 31m</li>
+                  <li>Sleep regularity: moderate, with noticeably later bedtimes on Wednesday and Saturday</li>
+                </ul>
+                <h3>Chart takeaway</h3>
+                <p>The most obvious pattern is that Wednesday had the best sleep structure and also the highest next-day recovery score, while Saturday fell below 6 hours and produced the sharpest recovery drop.</p>
+                <h3>Recovery relationship</h3>
+                <ul>
+                  <li>Average sleep score: 79/100; average recovery score: 74/100</li>
+                  <li>Within 24h after high-load sessions, resting HR increases by about 2 bpm</li>
+                  <li>When total sleep drops below 6h 40m, subjective fatigue rises clearly the next day</li>
+                </ul>
+                <h3>Quick read</h3>
+                <p>The main issue is not simply low sleep volume. It is sleep variability combined with incomplete recovery after high-load days. That will directly affect workout quality and long outdoor sessions.</p>
+                <h3>Recommendation</h3>
+                <ul>
+                  <li>Tighten your bedtime window to 23:00-23:30 for the next 7 days</li>
+                  <li>After high-intensity days, force a 30-40 minute low-intensity recovery block</li>
+                  <li>If recovery score stays below 70 for two consecutive days, make day three an easy run or full rest day</li>
+                </ul>
+              </div>
+            </section>
+          `,
+          hongkong: `
+            <div class="user-turn">@komoot recommend a few hiking routes in Hong Kong.</div>
+
+            <section class="assistant-turn">
+              <p class="assistant-lead">I pulled a few Hong Kong hiking routes from Komoot first, with options ranging from beginner-friendly to more advanced.</p>
+              <div class="thinking">Reasoned for 11s</div>
+
+              <div class="source-row">
+                <span class="source-dot" aria-hidden="true"></span>
+                <span>komoot</span>
+              </div>
+
+              <div class="cards">
+                <a href="#" class="route-card" data-demo-target="Komoot route detail">
+                  <div class="cover easy"><span class="badge easy">Easy</span></div>
+                  <div class="route-meta">📍 Hong Kong, China</div>
+                  <div class="route-title">Banyan Tree Park – Lugard Falls loop from ...</div>
+                  <div class="route-stats">↔ 2.65 mi ・ ◴ 01:17 h ・ ☆ 4.9</div>
+                </a>
+
+                <a href="#" class="route-card" data-demo-target="Komoot route detail">
+                  <div class="cover hard"><span class="badge hard">Hard</span></div>
+                  <div class="route-meta">📍 Hong Kong, China</div>
+                  <div class="route-title">Lugard Falls – Banyan Tree Park loop from L...</div>
+                  <div class="route-stats">↔ 7.51 mi ・ ◴ 03:56 h ・ ☆ 4.8</div>
+                </a>
+
+                <a href="#" class="route-card" data-demo-target="Komoot route detail">
+                  <div class="cover moderate"><span class="badge moderate">Moderate</span></div>
+                  <div class="route-meta">📍 Hong Kong, China</div>
+                  <div class="route-title">Lion Rock Summit – Lion Rock (Lion's Head) loop...</div>
+                  <div class="route-stats">↔ 5.22 mi ・ ◴ 02:59 h ・ ☆ 4.6</div>
+                </a>
+              </div>
+
+              <hr class="paragraph-divider" />
+
+              <div class="assistant-body">
+                <p>I found a set of popular Hong Kong routes that cover coastline, ridgeline, and urban-adjacent hiking. You can use the cards above to choose a direction first.</p>
+              </div>
+            </section>
+
+            <div class="user-turn followup">@Coros estimate how long this route would take for me based on my fitness model.</div>
+
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>Route timing · fitness model estimate</span></div>
+              <p class="assistant-lead">Coros fitness modeling has been applied using your last 8 weeks of load, hiking history, and current recovery state.</p>
+              <div class="thinking">Reasoned for 9s</div>
+
+              <div class="assistant-body">
+                <h3>Time estimate</h3>
+                <ul>
+                  <li>Steady completion: 3h 45m - 4h 20m</li>
+                  <li>Conservative completion (photos and fueling): 4h 30m - 5h 05m</li>
+                </ul>
+                <h3>Model inputs</h3>
+                <ul>
+                  <li>Your uphill efficiency is about 11% above peers at similar pacing</li>
+                  <li>Late-session heart-rate drift is controlled well, averaging 6.8%</li>
+                  <li>Average recovery score over the last 7 days is 74/100, which supports a successful completion</li>
+                </ul>
+                <h3>Execution advice</h3>
+                <p>If you want to keep perceived effort in a comfortable range, plan around roughly 4h 30m for fueling and stops. If temperatures are high or your pre-route recovery is poor, use the conservative range.</p>
+              </div>
+            </section>
+          `,
+          analysis: `
+            <div class="file-chip">
+              <div class="file-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path>
+                  <path d="M14 2v5h5"></path>
+                </svg>
+              </div>
+              <div>
+                <div class="file-name">Wugong Mountain reverse.kml</div>
+                <div class="file-type">File</div>
+              </div>
+            </div>
+            <div class="user-turn">@Coros estimate how long it would take me to finish this route based on my fitness model.</div>
+
+            <section class="assistant-turn">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>KML route parse · fitness model estimate</span></div>
+              <p class="assistant-lead">I recalculated the finish-time estimate using the Coros fitness model plus the terrain parameters from this KML. The model incorporates your last 8 weeks of load, resting-heart-rate trend, and recent recovery condition.</p>
+              <div class="thinking">Reasoned for 5m 35s</div>
+
+              <div class="assistant-body">
+                <h3>Time estimate</h3>
+                <ul>
+                  <li>Best-case (light pack, minimal stops): 10h 10m - 11h 05m</li>
+                  <li>Typical completion (photos + normal fueling): 11h 20m - 12h 40m</li>
+                  <li>Conservative completion (heavier pack / average weather): 13h 00m - 14h 20m</li>
+                </ul>
+                <p>If your goal is to keep risk and fatigue in a reasonable range, splitting the route across two days is the more stable option.</p>
+              </div>
+
+              <hr class="paragraph-divider" />
+
+              <div class="assistant-body">
+                <h3>Model inputs</h3>
+                <ul>
+                  <li>KML route: 24.43 km with roughly 2200 m of total ascent</li>
+                  <li>Your uphill efficiency is about 8% above your 90-day personal average</li>
+                  <li>Recovery score over the last 7 days averages 73/100 with mild fluctuation</li>
+                  <li>Your downhill fatigue sensitivity is higher on long sustained descents</li>
+                </ul>
+                <h3>Execution advice</h3>
+                <p>If you still want a single-day push, use the typical completion range for fueling, start-time planning, and weather contingency. If comfort and safety matter more than one-day completion, a two-day plan fits your current model much better.</p>
+              </div>
+            </section>
+          `
+        }
+      }
+    };
+
+    function refreshInteractiveRefs() {
+      views = Array.from(document.querySelectorAll("[data-view]"));
+      navButtons = Array.from(document.querySelectorAll("[data-nav-target]"));
+      chatButtons = Array.from(document.querySelectorAll("[data-chat-target]"));
+      conversations = Array.from(document.querySelectorAll(".conversation"));
+      appOpeners = Array.from(document.querySelectorAll("[data-open-app]"));
+      appBackButtons = Array.from(document.querySelectorAll("[data-back-to-apps]"));
+      connectCorosButtons = Array.from(document.querySelectorAll("[data-connect-coros]"));
+      closeAuthButtons = Array.from(document.querySelectorAll("[data-close-auth]"));
+      demoTargets = Array.from(document.querySelectorAll("[data-demo-target]"));
+      demoActions = Array.from(document.querySelectorAll("[data-demo-action]"));
+      composerInput = document.querySelector(".composer-input");
+    }
+
+    function switchView(viewId) {
+      currentView = viewId;
+      views.forEach((view) => {
+        view.classList.toggle("active", view.dataset.view === viewId);
+      });
+      navButtons.forEach((button) => {
+        button.classList.toggle("active-nav", button.dataset.navTarget === viewId);
+      });
+    }
+
+    function openDemo() {
+      switchView("demo");
+    }
+
+    function applyChatState(chatId) {
+      currentChat = chatId;
+      chatButtons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.chatTarget === chatId);
+      });
+      conversations.forEach((panel) => {
+        panel.classList.toggle("active", panel.dataset.chatId === chatId);
+      });
+      const drafts = composerDraftsByLang[currentLanguage] || composerDraftsByLang.zh;
+      if (composerInput && drafts[chatId]) {
+        composerInput.value = drafts[chatId];
+      }
+    }
+
+    function switchChat(chatId) {
+      switchView("chat");
+      applyChatState(chatId);
+    }
+
+    function openCorosAuth() {
+      if (!corosAuthModal) return;
+      corosAuthModal.classList.add("show");
+      corosAuthModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeCorosAuth() {
+      if (!corosAuthModal) return;
+      corosAuthModal.classList.remove("show");
+      corosAuthModal.setAttribute("aria-hidden", "true");
+    }
+
+    function bindInteractions() {
+      refreshInteractiveRefs();
+
+      chatButtons.forEach((button) => {
+        button.onclick = () => switchChat(button.dataset.chatTarget);
+      });
+
+      navButtons.forEach((button) => {
+        button.onclick = () => switchView(button.dataset.navTarget);
+      });
+
+      appOpeners.forEach((opener) => {
+        opener.onclick = () => switchView("app-detail");
+      });
+
+      appBackButtons.forEach((button) => {
+        button.onclick = () => switchView("apps");
+      });
+
+      demoTargets.forEach((target) => {
+        target.onclick = (event) => {
+          if (event && event.cancelable) event.preventDefault();
+          openDemo();
+        };
+      });
+
+      demoActions.forEach((action) => {
+        action.onclick = () => {
+          if (action.dataset.demoAction === "apps") {
+            switchView("apps");
+            return;
+          }
+          if (action.dataset.demoAction) {
+            switchChat(action.dataset.demoAction);
+          }
+        };
+      });
+
+      connectCorosButtons.forEach((button) => {
+        button.onclick = openCorosAuth;
+      });
+
+      closeAuthButtons.forEach((button) => {
+        button.onclick = closeCorosAuth;
+      });
+
+      if (corosAuthModal) {
+        corosAuthModal.onclick = (event) => {
+          if (event.target === corosAuthModal) closeCorosAuth();
+        };
+      }
+    }
+
+    function updateStaticCopy(lang) {
+      const copy = uiCopy[lang];
+      document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+      if (langToggle) langToggle.textContent = lang === "zh" ? "EN" : "中文";
+
+      const ids = [
+        "labelNewChat",
+        "labelSearchChats",
+        "labelImages",
+        "labelApps",
+        "labelDeepResearch",
+        "labelGpts",
+        "menuTitleProjects",
+        "menuTitleChats",
+        "modelModeLabel",
+        "shareLabel"
+      ];
+      ids.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el && copy[id]) el.textContent = copy[id];
+      });
+
+      document.querySelectorAll(".chat-label").forEach((label) => {
+        const key = label.dataset.chatLabel;
+        if (copy.chatLabels[key]) label.textContent = copy.chatLabels[key];
+      });
+
+      const projectItems = Array.from(document.querySelectorAll(".project-item"));
+      projectItems.forEach((item, index) => {
+        if (copy.projectItems[index]) item.textContent = copy.projectItems[index];
+      });
+
+      const disclaimerText = document.getElementById("disclaimerText");
+      if (disclaimerText) disclaimerText.innerHTML = copy.disclaimer;
+
+      const userPlan = document.querySelector(".user-plan");
+      if (userPlan) userPlan.textContent = copy.userPlan;
+
+      const thinkingPill = document.querySelector(".thinking-pill");
+      if (thinkingPill) thinkingPill.textContent = copy.thinkingPill;
+    }
+
+    function renderLanguage(lang) {
+      const authOpen = corosAuthModal?.classList.contains("show");
+      currentLanguage = lang;
+      localStorage.setItem("coros-demo-language", lang);
+
+      updateStaticCopy(lang);
+
+      appsPageContainer.innerHTML = templates.appsPage[lang];
+      appDetailContainer.innerHTML = templates.appDetail[lang];
+      demoViewContainer.innerHTML = templates.demoView[lang];
+      authPanelContainer.innerHTML = templates.authPanel[lang];
+
+      Object.keys(templates.conversations[lang]).forEach((chatId) => {
+        const panel = document.querySelector(`[data-chat-id="${chatId}"]`);
+        if (panel) panel.innerHTML = templates.conversations[lang][chatId];
+      });
+
+      bindInteractions();
+      switchView(currentView);
+      applyChatState(currentChat);
+
+      if (authOpen) openCorosAuth();
+    }
+
+    if (langToggle) {
+      langToggle.onclick = () => {
+        renderLanguage(currentLanguage === "zh" ? "en" : "zh");
+      };
+    }
+
+    bindInteractions();
+    renderLanguage(currentLanguage);
+  </script>
+</body>
+</html>
