@@ -60,100 +60,6 @@
       position: relative;
     }
 
-    .demo-shell[hidden] {
-      display: none !important;
-    }
-
-    .demo-gate {
-      position: fixed;
-      inset: 0;
-      z-index: 2000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background: rgba(247, 247, 248, 0.82);
-      backdrop-filter: blur(10px);
-    }
-
-    .demo-gate[hidden] {
-      display: none !important;
-    }
-
-    .gate-card {
-      width: min(100%, 420px);
-      border-radius: 22px;
-      border: 1px solid #e5e5e5;
-      background: rgba(255, 255, 255, 0.98);
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.07);
-      padding: 24px;
-    }
-
-    .gate-mark {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      border: 1px solid #e5e5e5;
-      background: #fff;
-      display: grid;
-      place-items: center;
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 18px;
-    }
-
-    .gate-title {
-      font-size: 28px;
-      line-height: 1.12;
-      letter-spacing: -0.04em;
-      margin-bottom: 8px;
-    }
-
-    .gate-copy {
-      font-size: 14px;
-      line-height: 1.55;
-      color: #6b7280;
-      margin-bottom: 14px;
-    }
-
-    .gate-form {
-      display: grid;
-      gap: 10px;
-    }
-
-    .gate-input {
-      width: 100%;
-      height: 48px;
-      border-radius: 12px;
-      border: 1px solid #d9d9de;
-      background: #fff;
-      padding: 0 14px;
-      font-size: 16px;
-      color: #111827;
-      outline: none;
-    }
-
-    .gate-input:focus {
-      border-color: #b9c0cb;
-    }
-
-    .gate-submit {
-      height: 46px;
-      border: 1px solid #202123;
-      border-radius: var(--radius-pill);
-      background: #202123;
-      color: #fff;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-    }
-
-    .gate-error {
-      min-height: 18px;
-      font-size: 12px;
-      color: #b42318;
-    }
-
     .app-shell {
       display: grid;
       grid-template-columns: 260px minmax(0, 1fr);
@@ -418,6 +324,50 @@
       background: rgba(255, 255, 255, 0.82);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid rgba(229, 229, 229, 0.78);
+    }
+
+    .demo-tip {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 16px;
+      border-bottom: 1px solid #f3d17a;
+      background: #fff7db;
+      color: #6b4e16;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .demo-tip[hidden] {
+      display: none !important;
+    }
+
+    .demo-tip strong {
+      color: #7a5606;
+      font-weight: 600;
+    }
+
+    .demo-tip-close {
+      flex: 0 0 auto;
+      min-width: 36px;
+      height: 36px;
+      border: 1px solid #e8c86d;
+      border-radius: 10px;
+      background: #fff1bf;
+      color: #7a5606;
+      font-size: 18px;
+      line-height: 1;
+      font-weight: 600;
+      cursor: pointer;
+      pointer-events: auto;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+    }
+
+    .demo-tip-close:hover {
+      background: #ffe79a;
+      border-color: #d7b452;
+      color: #5c4107;
     }
 
     .mobile-nav::-webkit-scrollbar {
@@ -1681,6 +1631,10 @@
         display: flex;
       }
 
+      .demo-tip {
+        padding: 10px 14px;
+      }
+
       .thread {
         padding: 0 14px;
       }
@@ -1761,20 +1715,6 @@
   </style>
 </head>
 <body>
-  <div class="demo-gate" id="demoGate">
-    <div class="gate-card">
-      <div class="gate-mark">CR</div>
-      <h1 class="gate-title">COROS Demo</h1>
-      <p class="gate-copy">请输入访问密码后查看演示内容。</p>
-      <form class="gate-form" id="demoGateForm">
-        <input class="gate-input" id="demoGateInput" type="password" inputmode="numeric" autocomplete="off" placeholder="访问密码" />
-        <button class="gate-submit" type="submit">进入 Demo</button>
-        <div class="gate-error" id="demoGateError"></div>
-      </form>
-    </div>
-  </div>
-
-  <div class="demo-shell" id="demoShell" hidden>
   <div class="app-shell">
     <aside class="sidebar">
       <div class="sidebar-scroll">
@@ -1854,9 +1794,15 @@
         <div class="menu-group">
           <button class="chat-item" data-chat-target="route-estimate"><span class="chat-label" data-chat-label="route-estimate">路线分析与预计时间</span> <span class="dot"></span></button>
         </div>
-        <div class="chat-section-label">二期能力预览</div>
+        <div class="chat-section-label">二期内容</div>
         <div class="menu-group">
-          <button class="chat-item" data-chat-target="phase-two-preview"><span class="chat-label" data-chat-label="phase-two-preview">二期能力预览</span> <span class="dot"></span></button>
+          <button class="chat-item" data-chat-target="hongkong-routes"><span class="chat-label" data-chat-label="hongkong-routes">香港徒步路线推荐</span> <span class="dot"></span></button>
+          <button class="chat-item" data-chat-target="recovery-coach"><span class="chat-label" data-chat-label="recovery-coach">恢复教练</span> <span class="dot"></span></button>
+          <button class="chat-item" data-chat-target="race-prep"><span class="chat-label" data-chat-label="race-prep">赛事准备场景</span> <span class="dot"></span></button>
+          <button class="chat-item" data-chat-target="watermark-photo"><span class="chat-label" data-chat-label="watermark-photo">水印照片</span> <span class="dot"></span></button>
+          <button class="chat-item" data-chat-target="watchface-custom"><span class="chat-label" data-chat-label="watchface-custom">自定义表盘</span> <span class="dot"></span></button>
+          <button class="chat-item" data-chat-target="training-plan"><span class="chat-label" data-chat-label="training-plan">生成训练计划</span> <span class="dot"></span></button>
+          <button class="chat-item" data-chat-target="workflow-export"><span class="chat-label" data-chat-label="workflow-export">活动文件导出 / 外部工作流联动</span> <span class="dot"></span></button>
         </div>
 
         <div class="spacer"></div>
@@ -1890,6 +1836,11 @@
         </div>
       </header>
 
+      <div class="demo-tip" id="demoTipBar">
+        <div id="demoTipText"><strong>演示说明：</strong>当前页面仅用于产品演示，不代表真实服务已上线。如需了解方案或反馈问题，可联系 @许志翔。</div>
+        <button class="demo-tip-close" id="demoTipClose" type="button" aria-label="关闭提示">×</button>
+      </div>
+
       <div class="mobile-nav" aria-label="移动端导航">
         <button class="mobile-nav-btn active" type="button" data-mobile-chat="coros-basic">基础查询</button>
         <button class="mobile-nav-btn" type="button" data-mobile-chat="sleep-analysis">睡眠分析</button>
@@ -1897,7 +1848,9 @@
         <button class="mobile-nav-btn" type="button" data-mobile-chat="training-calendar">训练日历</button>
         <button class="mobile-nav-btn" type="button" data-mobile-chat="device-account">账户服务</button>
         <button class="mobile-nav-btn" type="button" data-mobile-chat="route-estimate">路线预估</button>
-        <button class="mobile-nav-btn" type="button" data-mobile-chat="phase-two-preview">二期</button>
+        <button class="mobile-nav-btn" type="button" data-mobile-chat="hongkong-routes">香港路线</button>
+        <button class="mobile-nav-btn" type="button" data-mobile-chat="recovery-coach">恢复教练</button>
+        <button class="mobile-nav-btn" type="button" data-mobile-chat="training-plan">训练计划</button>
         <button class="mobile-nav-btn" type="button" data-mobile-view="apps">应用</button>
         <button class="mobile-nav-btn" type="button" data-mobile-view="demo">说明</button>
       </div>
@@ -2170,22 +2123,173 @@
             </section>
           </section>
 
-          <section class="conversation" data-chat-id="phase-two-preview">
-            <div class="user-turn">后面还能做什么？你先给我看下未来方向。</div>
+          <section class="conversation" data-chat-id="hongkong-routes">
+            <div class="user-turn">@komoot 推荐几条香港周末能走的徒步路线。</div>
+            <section class="assistant-turn">
+              <p class="assistant-lead">我先从 komoot 里帮你找几条香港附近比较适合周末走的路线，强度从轻松到进阶都给你放上来。</p>
+              <div class="thinking">已思考 11s</div>
+              <div class="source-row">
+                <span class="source-dot" aria-hidden="true"></span>
+                <span>komoot</span>
+              </div>
+              <div class="cards">
+                <a href="#" class="route-card" data-demo-target="Komoot 路线详情">
+                  <div class="cover easy"><span class="badge easy">Easy</span></div>
+                  <div class="route-meta">📍 Hong Kong, China</div>
+                  <div class="route-title">Banyan Tree Park – Lugard Falls loop from ...</div>
+                  <div class="route-stats">↔ 2.65 mi ・ ◴ 01:17 h ・ ☆ 4.9</div>
+                </a>
+                <a href="#" class="route-card" data-demo-target="Komoot 路线详情">
+                  <div class="cover hard"><span class="badge hard">Hard</span></div>
+                  <div class="route-meta">📍 Hong Kong, China</div>
+                  <div class="route-title">Lugard Falls – Banyan Tree Park loop from L...</div>
+                  <div class="route-stats">↔ 7.51 mi ・ ◴ 03:56 h ・ ☆ 4.8</div>
+                </a>
+                <a href="#" class="route-card" data-demo-target="Komoot 路线详情">
+                  <div class="cover moderate"><span class="badge moderate">Moderate</span></div>
+                  <div class="route-meta">📍 Hong Kong, China</div>
+                  <div class="route-title">Lion Rock Summit – Lion Rock (Lion's Head) loo...</div>
+                  <div class="route-stats">↔ 5.22 mi ・ ◴ 02:59 h ・ ☆ 4.6</div>
+                </a>
+              </div>
+              <hr class="paragraph-divider" />
+              <div class="assistant-body">
+                <p>我给你挑了海岸线、山脊线和城市近郊三种方向。你可以先看路线卡片挑一条，再让我用 Coros 体能模型继续算时间。</p>
+              </div>
+            </section>
+            <div class="user-turn followup">@Coros 结合我的体能模型，分析一下我大概要用多久时间能走完这条路线。</div>
             <section class="assistant-turn compact">
-              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>二期能力预览 · 方向展示</span></div>
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>二期内容 · 路线推荐联动</span></div>
+              <p class="assistant-lead">已调用 Coros 体能模型（近 8 周跑步负荷 + 徒步历史 + 恢复状态）对你选中的路线进行估算。</p>
+              <div class="thinking">已思考 9s</div>
+              <div class="assistant-body">
+                <h3>估算结果</h3>
+                <ul>
+                  <li>稳态完成：3h 45m - 4h 20m</li>
+                  <li>保守完成（含拍照/补给）：4h 30m - 5h 05m</li>
+                </ul>
+                <h3>依据</h3>
+                <ul>
+                  <li>你的最近 30 天上坡效率高于同配速人群约 11%</li>
+                  <li>长距离后半程心率漂移控制较好（均值 6.8%）</li>
+                  <li>近 7 天恢复评分均值 74/100，属于可完成强度</li>
+                </ul>
+                <h3>执行建议</h3>
+                <p>如果你希望把体感压力控制在舒适区间，建议按 4h 30m 左右去规划补给和停留点；若当天气温偏高或前一晚恢复不足，优先参考保守区间。</p>
+              </div>
+            </section>
+          </section>
+
+          <section class="conversation" data-chat-id="recovery-coach">
+            <div class="user-turn">我今天适合跑间歇吗？</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>二期内容 · 恢复教练</span></div>
               <div class="assistant-body">
                 <h3>概览</h3>
-                <p>下面这些方向都属于二期能力预览。它们会延续当前查询和分析能力，但会更偏向跨应用联动、主动建议和生成式能力。</p>
+                <p>如果按你昨晚睡眠、HRV、静息心率和最近 3 天训练负荷一起看，今天不建议再做高强度间歇，更适合恢复跑或休息。</p>
+                <h3>会返回什么</h3>
+                <ul>
+                  <li>今天建议的训练类型：恢复跑 40-50 分钟 / 完全休息</li>
+                  <li>不建议训练类型：VO2max 间歇、长阈值课</li>
+                  <li>判断依据：HRV 低于个人周均值 9%，静息心率上浮 2 bpm，恢复评分 68/100</li>
+                </ul>
+                <h3>价值</h3>
+                <p>把“今天到底能不能练”直接说清楚，减少用户自己拼睡眠、HRV 和负荷指标的成本。</p>
               </div>
-              <div class="preview-grid">
-                <article class="preview-card"><div class="status-chip">二期内容</div><h4>香港徒步路线推荐</h4><p><strong>用户会问：</strong>“帮我找几条适合周末走的香港徒步路线。”<br><strong>会返回：</strong>先拿到外部路线候选，再结合 Coros 体能模型估算难度和耗时。</p></article>
-                <article class="preview-card"><div class="status-chip">二期内容</div><h4>恢复教练</h4><p><strong>用户会问：</strong>“我今天适合跑间歇吗？”<br><strong>会返回：</strong>结合睡眠、HRV、静息心率和训练负荷给出训练强度建议。</p></article>
-                <article class="preview-card"><div class="status-chip">二期内容</div><h4>赛事准备场景</h4><p><strong>用户会问：</strong>“我四周后跑半马，按现在状态目标配速合理吗？”<br><strong>会返回：</strong>目标可行性判断、备赛风险和接下来几周的训练建议。</p></article>
-                <article class="preview-card"><div class="status-chip">二期内容</div><h4>水印照片</h4><p><strong>用户会问：</strong>“把我昨天那次跑步做成能发朋友圈的图。”<br><strong>会返回：</strong>带成绩、路线和关键指标的分享图。</p></article>
-                <article class="preview-card"><div class="status-chip">二期内容</div><h4>自定义表盘</h4><p><strong>用户会问：</strong>“帮我配一个适合越野训练的表盘。”<br><strong>会返回：</strong>基于设备型号和偏好生成表盘配置方案。</p></article>
-                <article class="preview-card"><div class="status-chip">二期内容</div><h4>生成训练计划</h4><p><strong>用户会问：</strong>“按我现在状态，帮我排一周训练计划。”<br><strong>会返回：</strong>结合体能模型、恢复状态和目标生成阶段性安排。</p></article>
-                <article class="preview-card"><div class="status-chip">二期内容</div><h4>活动文件导出 / 外部工作流联动</h4><p><strong>用户会问：</strong>“把这次活动导出给别的工具继续分析。”<br><strong>会返回：</strong>标准文件导出和面向外部工作流的连接能力。</p></article>
+            </section>
+          </section>
+
+          <section class="conversation" data-chat-id="race-prep">
+            <div class="user-turn">我四周后跑半马，按我现在状态，目标配速 4'35&quot;/km 合理吗？</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>二期内容 · 赛事准备</span></div>
+              <div class="assistant-body">
+                <h3>概览</h3>
+                <p>以你当前体能模型和最近 6 周训练完成度来看，4'35"/km 属于偏进取但仍可争取的目标，更稳妥的比赛节奏会落在 4'39"-4'43"/km。</p>
+                <h3>会返回什么</h3>
+                <ul>
+                  <li>目标可行性判断：可冲，但容错较低</li>
+                  <li>当前短板：阈值耐力稳定，但比赛后半程抗衰减不足</li>
+                  <li>接下来两周重点：1 次半马配速稳态跑 + 1 次长距离末段加速</li>
+                </ul>
+                <h3>价值</h3>
+                <p>用户不用先自己换算能力和比赛目标，就能知道目标是否合理，以及接下来该怎么练。</p>
+              </div>
+            </section>
+          </section>
+
+          <section class="conversation" data-chat-id="watermark-photo">
+            <div class="user-turn">把我昨天那次跑步做成一张能直接分享的图。</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>二期内容 · 水印照片</span></div>
+              <div class="assistant-body">
+                <h3>概览</h3>
+                <p>Coros 会读取你昨天那次跑步的路线、成绩和关键指标，自动生成一张适合分享的图片，不需要你再手动排版。</p>
+                <h3>会返回什么</h3>
+                <ul>
+                  <li>路线 + 成绩版海报：14.2 km / 1:18:12 / 平均配速 5'30"/km</li>
+                  <li>可选模板：极简数据版、路线纪念版、社交分享版</li>
+                  <li>导出尺寸：朋友圈竖版 / 小红书方版 / Instagram Story</li>
+                </ul>
+                <h3>价值</h3>
+                <p>把活动分享从“导出数据再二次制作”变成一句话完成，适合更强的内容传播场景。</p>
+              </div>
+            </section>
+          </section>
+
+          <section class="conversation" data-chat-id="watchface-custom">
+            <div class="user-turn">帮我配一个适合越野训练的表盘。</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>二期内容 · 自定义表盘</span></div>
+              <div class="assistant-body">
+                <h3>概览</h3>
+                <p>如果按你的设备型号和常见训练场景来配，越野训练表盘会优先放海拔、累计爬升、当前心率、剩余电量和导航状态。</p>
+                <h3>会返回什么</h3>
+                <ul>
+                  <li>适配设备：VERTIX 2S / PACE 3</li>
+                  <li>推荐字段布局：主屏 5 项核心字段 + 次屏补给/时间信息</li>
+                  <li>可选主题：高对比户外版、极简耐力版</li>
+                </ul>
+                <h3>价值</h3>
+                <p>用户不用在表盘配置里逐项试错，能直接拿到适合当前运动场景的布局建议。</p>
+              </div>
+            </section>
+          </section>
+
+          <section class="conversation" data-chat-id="training-plan">
+            <div class="user-turn">按我现在状态，帮我排一周训练计划。</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>二期内容 · 生成训练计划</span></div>
+              <div class="assistant-body">
+                <h3>概览</h3>
+                <p>Coros 会结合你当前体能模型、恢复状态和目标，生成一周训练安排，并给出每节训练的目的和强度建议。</p>
+                <h3>会返回什么</h3>
+                <ul>
+                  <li>周一恢复跑、周三阈值课、周六长距离的结构化周计划</li>
+                  <li>每节训练的目标区间、推荐时长和强度说明</li>
+                  <li>如果恢复不足时的自动降级建议</li>
+                </ul>
+                <h3>价值</h3>
+                <p>用户可以直接从“我下周怎么练”过渡到可执行的安排，而不是只得到泛泛建议。</p>
+              </div>
+            </section>
+          </section>
+
+          <section class="conversation" data-chat-id="workflow-export">
+            <div class="user-turn">把这次活动导出给别的工具继续分析。</div>
+            <section class="assistant-turn compact">
+              <div class="tool-header"><span class="tool-status-dot" aria-hidden="true"></span><strong>Coros MCP</strong><span>二期内容 · 导出与联动</span></div>
+              <div class="assistant-body">
+                <h3>概览</h3>
+                <p>Coros 会提供标准活动文件导出入口，并把这次活动交给其他工具继续做路线分析、内容生成或团队协作。</p>
+                <h3>会返回什么</h3>
+                <ul>
+                  <li>支持格式：FIT / TCX / GPX</li>
+                  <li>导出内容：轨迹、分圈、心率、功率、海拔等完整活动数据</li>
+                  <li>外部流转方式：下载链接、工作流节点或发送到兼容客户端</li>
+                </ul>
+                <h3>价值</h3>
+                <p>让活动数据不只停留在单一产品里，而是能直接进入用户已有的分析和协作流程。</p>
               </div>
             </section>
           </section>
@@ -2435,54 +2539,17 @@
       </div>
     </div>
   </div>
-
   <script>
-    const DEMO_PASSWORD = "0232";
-    const DEMO_ACCESS_KEY = "product-demo-coros-access";
-    const demoGate = document.getElementById("demoGate");
-    const demoShell = document.getElementById("demoShell");
-    const demoGateForm = document.getElementById("demoGateForm");
-    const demoGateInput = document.getElementById("demoGateInput");
-    const demoGateError = document.getElementById("demoGateError");
-
-    function unlockDemo() {
-      if (demoGate) demoGate.hidden = true;
-      if (demoShell) demoShell.hidden = false;
-      sessionStorage.setItem(DEMO_ACCESS_KEY, "granted");
-    }
-
-    function initDemoGate() {
-      if (sessionStorage.getItem(DEMO_ACCESS_KEY) === "granted") {
-        unlockDemo();
-        return;
-      }
-
-      if (demoGate) demoGate.hidden = false;
-      if (demoShell) demoShell.hidden = true;
-
-      if (demoGateForm) {
-        demoGateForm.addEventListener("submit", (event) => {
-          event.preventDefault();
-          if (!demoGateInput) return;
-
-          if (demoGateInput.value === DEMO_PASSWORD) {
-            if (demoGateError) demoGateError.textContent = "";
-            unlockDemo();
-            return;
-          }
-
-          if (demoGateError) demoGateError.textContent = "密码错误";
-          demoGateInput.select();
-        });
-      }
-    }
 
     const corosAuthModal = document.getElementById("corosAuthModal");
     const langToggle = document.getElementById("langToggle");
+    const demoTipBar = document.getElementById("demoTipBar");
+    const demoTipClose = document.getElementById("demoTipClose");
     const appsPageContainer = document.getElementById("appsPageContainer");
     const appDetailContainer = document.getElementById("appDetailContainer");
     const demoViewContainer = document.getElementById("demoViewContainer");
     const authPanelContainer = document.getElementById("authPanelContainer");
+    const DEMO_TIP_KEY = "coros-demo-tip-dismissed";
 
     let views = [];
     let navButtons = [];
@@ -2510,7 +2577,13 @@
       "training-calendar": document.querySelector('[data-chat-id="training-calendar"]').innerHTML,
       "device-account": document.querySelector('[data-chat-id="device-account"]').innerHTML,
       "route-estimate": document.querySelector('[data-chat-id="route-estimate"]').innerHTML,
-      "phase-two-preview": document.querySelector('[data-chat-id="phase-two-preview"]').innerHTML
+      "hongkong-routes": document.querySelector('[data-chat-id="hongkong-routes"]').innerHTML,
+      "recovery-coach": document.querySelector('[data-chat-id="recovery-coach"]').innerHTML,
+      "race-prep": document.querySelector('[data-chat-id="race-prep"]').innerHTML,
+      "watermark-photo": document.querySelector('[data-chat-id="watermark-photo"]').innerHTML,
+      "watchface-custom": document.querySelector('[data-chat-id="watchface-custom"]').innerHTML,
+      "training-plan": document.querySelector('[data-chat-id="training-plan"]').innerHTML,
+      "workflow-export": document.querySelector('[data-chat-id="workflow-export"]').innerHTML
     };
     const conversationSeedEn = { ...conversationSeedZh };
 
@@ -2531,6 +2604,8 @@
         menuTitleChats: "你的聊天",
         modelModeLabel: "Thinking",
         shareLabel: "分享",
+        demoTip:
+          "<strong>演示提示：</strong>当前页面仅用于产品演示，不代表真实功能已上线。如需了解方案细节或反馈问题，可联系 @许志翔。",
         disclaimer:
           'ChatGPT 也可能会犯错。请核查重要信息。查看&nbsp;<a href="#" data-demo-target="Cookie 首选项">Cookie 首选项</a>。',
         chatLabels: {
@@ -2541,7 +2616,13 @@
           "training-calendar": "训练日历查询",
           "device-account": "设备与账户服务场景",
           "route-estimate": "路线分析与预计时间",
-          "phase-two-preview": "二期能力预览"
+          "hongkong-routes": "香港徒步路线推荐",
+          "recovery-coach": "恢复教练",
+          "race-prep": "赛事准备场景",
+          "watermark-photo": "水印照片",
+          "watchface-custom": "自定义表盘",
+          "training-plan": "生成训练计划",
+          "workflow-export": "活动文件导出 / 外部工作流联动"
         },
         mobileChatLabels: {
           "coros-basic": "基础查询",
@@ -2550,7 +2631,9 @@
           "training-calendar": "训练日历",
           "device-account": "账户服务",
           "route-estimate": "路线预估",
-          "phase-two-preview": "二期预览"
+          "hongkong-routes": "香港路线",
+          "recovery-coach": "恢复教练",
+          "training-plan": "训练计划"
         },
         mobileViewLabels: {
           apps: "应用",
@@ -2571,6 +2654,8 @@
         menuTitleChats: "Your chats",
         modelModeLabel: "Thinking",
         shareLabel: "Share",
+        demoTip:
+          "<strong>Demo note:</strong> This page is for product demonstration only and does not represent a live feature release. For questions or feedback, contact @Xuzhixiang.",
         disclaimer:
           'ChatGPT can make mistakes. Check important info. See&nbsp;<a href="#" data-demo-target="Cookie preferences">Cookie Preferences</a>.',
         chatLabels: {
@@ -2581,7 +2666,13 @@
           "training-calendar": "Training calendar",
           "device-account": "Device and account services",
           "route-estimate": "Route timing estimate",
-          "phase-two-preview": "Phase-two preview"
+          "hongkong-routes": "Hong Kong hiking routes",
+          "recovery-coach": "Recovery coach",
+          "race-prep": "Race prep scenario",
+          "watermark-photo": "Watermarked share photo",
+          "watchface-custom": "Custom watch face",
+          "training-plan": "Training plan generation",
+          "workflow-export": "Activity export and workflow"
         },
         mobileChatLabels: {
           "coros-basic": "Queries",
@@ -2590,7 +2681,9 @@
           "training-calendar": "Calendar",
           "device-account": "Account",
           "route-estimate": "Route",
-          "phase-two-preview": "Phase 2"
+          "hongkong-routes": "HK routes",
+          "recovery-coach": "Recovery",
+          "training-plan": "Plan"
         },
         mobileViewLabels: {
           apps: "Apps",
@@ -2611,7 +2704,13 @@
         "training-calendar": "帮我看下这周后面几天怎么安排的。",
         "device-account": "我现在绑了哪些设备？授权状态也顺便看下。",
         "route-estimate": "这条线按我现在状态，大概要走多久？",
-        "phase-two-preview": "后面还能做什么？先给我看下未来方向。"
+        "hongkong-routes": "@komoot 推荐几条香港周末能走的徒步路线。",
+        "recovery-coach": "我今天适合跑间歇吗？",
+        "race-prep": "我四周后跑半马，按现在状态目标配速合理吗？",
+        "watermark-photo": "把我昨天那次跑步做成能直接分享的图。",
+        "watchface-custom": "帮我配一个适合越野训练的表盘。",
+        "training-plan": "按我现在状态，帮我排一周训练计划。",
+        "workflow-export": "把这次活动导出给别的工具继续分析。"
       },
       en: {
         "coros-basic": "What have I been doing lately? Give me a quick overview.",
@@ -2621,7 +2720,13 @@
         "training-calendar": "Show me the rest of this week's training plan.",
         "device-account": "Which devices are linked to my account, and what's my access status?",
         "route-estimate": "How long would this route take me right now?",
-        "phase-two-preview": "What else could this support later? Show me the roadmap."
+        "hongkong-routes": "@komoot recommend a few Hong Kong hiking routes for this weekend.",
+        "recovery-coach": "Am I in shape for intervals today?",
+        "race-prep": "My half marathon is four weeks away. Is my goal pace realistic?",
+        "watermark-photo": "Turn yesterday's run into a shareable image.",
+        "watchface-custom": "Set up a watch face for trail training.",
+        "training-plan": "Build me a one-week training plan from my current status.",
+        "workflow-export": "Export this activity so another tool can analyze it."
       }
     };
 
@@ -2979,6 +3084,33 @@
       }
     }
 
+    function initDemoTip() {
+      if (!demoTipBar || !demoTipClose) return;
+      demoTipClose.onclick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        localStorage.setItem(DEMO_TIP_KEY, "dismissed");
+        demoTipBar.hidden = true;
+        demoTipBar.style.display = "none";
+      };
+      if (localStorage.getItem(DEMO_TIP_KEY) === "dismissed") {
+        demoTipBar.hidden = true;
+        demoTipBar.style.display = "none";
+      } else {
+        demoTipBar.hidden = false;
+        demoTipBar.style.display = "";
+      }
+    }
+
+    document.addEventListener("click", (event) => {
+      const closeButton = event.target.closest("#demoTipClose");
+      if (!closeButton || !demoTipBar) return;
+      event.preventDefault();
+      localStorage.setItem(DEMO_TIP_KEY, "dismissed");
+      demoTipBar.hidden = true;
+      demoTipBar.style.display = "none";
+    });
+
     function updateStaticCopy(lang) {
       const copy = uiCopy[lang];
       document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
@@ -3024,6 +3156,9 @@
       const disclaimerText = document.getElementById("disclaimerText");
       if (disclaimerText) disclaimerText.innerHTML = copy.disclaimer;
 
+      const demoTipText = document.getElementById("demoTipText");
+      if (demoTipText) demoTipText.innerHTML = copy.demoTip;
+
       const userPlan = document.querySelector(".user-plan");
       if (userPlan) userPlan.textContent = copy.userPlan;
 
@@ -3049,6 +3184,7 @@
       });
 
       bindInteractions();
+      initDemoTip();
       switchView(currentView);
       applyChatState(currentChat);
 
@@ -3063,8 +3199,7 @@
 
     bindInteractions();
     renderLanguage(currentLanguage);
-    initDemoGate();
+    initDemoTip();
   </script>
-  </div>
 </body>
 </html>
